@@ -569,8 +569,14 @@
 
     <!-- Interactive Welcome Card with Categories -->
     <div class="welcome-card" id="welcomeCard">
-      <h4><span>👋</span> Welcome to <span id="welcomeGymName">Tarvos Fit</span>!</h4>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div id="welcomeLogoWrap" style="width:36px;height:36px;border-radius:8px;overflow:hidden;background:#ffffff;border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <span style="font-size:20px;">🏋️</span>
+        </div>
+        <h4 style="margin:0;font-size:16px;">Welcome to <span id="welcomeGymName">Tarvos Fit</span>!</h4>
+      </div>
       <p>I am your 24/7 fitness assistant. Tap any category below to explore details or ask your questions directly:</p>
+
       
       <div class="category-grid" id="categoryGrid">
         <!-- 1. Equipment -->
@@ -750,6 +756,10 @@ async function loadGymInfo(){
       localStorage.setItem("gym_logo", gymInfoData.logo_url);
       renderLogo(gymInfoData.logo_url);
     }
+    if(gymInfoData.theme){
+      GymTheme.applyTheme(gymInfoData.theme, gymInfoData.theme.font_family, gymInfoData.logo_url, GYM_NAME);
+    }
+
     if(gymInfoData.primary_phone){
       headerCallBtn.href = `tel:${gymInfoData.primary_phone}`;
       headerCallBtn.style.display = "flex";

@@ -167,14 +167,13 @@
 
   function applyTheme(themeData, fontName, logoUrl, gymName) {
     const root = document.documentElement;
-    const style = root.style;
-
-    if (themeData) {
+    const style = root.style;    if (themeData) {
       if (themeData.primary_color || themeData.primary) {
         const p = themeData.primary_color || themeData.primary;
         style.setProperty("--primary", p);
         style.setProperty("--accent", p);
         style.setProperty("--accent-primary", p);
+        style.setProperty("--button-bg", p);
       }
       if (themeData.secondary_color || themeData.secondary) {
         const s = themeData.secondary_color || themeData.secondary;
@@ -183,22 +182,27 @@
         style.setProperty("--header-bg", s);
       }
       if (themeData.chatbot_header_color || themeData.chatHeaderBg) {
-        style.setProperty("--header-bg", themeData.chatbot_header_color || themeData.chatHeaderBg);
+        const h = themeData.chatbot_header_color || themeData.chatHeaderBg;
+        style.setProperty("--header-bg", h);
+        style.setProperty("--wa-header-bg", h);
       }
       if (themeData.user_msg_color || themeData.userMsgBg) {
-        style.setProperty("--user-msg-bg", themeData.user_msg_color || themeData.userMsgBg);
+        const u = themeData.user_msg_color || themeData.userMsgBg;
+        style.setProperty("--user-msg-bg", u);
       }
       if (themeData.user_msg_text || themeData.userMsgText) {
         style.setProperty("--user-msg-text", themeData.user_msg_text || themeData.userMsgText);
       }
       if (themeData.bot_msg_color || themeData.botMsgBg) {
-        style.setProperty("--bot-msg-bg", themeData.bot_msg_color || themeData.botMsgBg);
+        const b = themeData.bot_msg_color || themeData.botMsgBg;
+        style.setProperty("--bot-msg-bg", b);
       }
       if (themeData.bot_msg_text || themeData.botMsgText) {
         style.setProperty("--bot-msg-text", themeData.bot_msg_text || themeData.botMsgText);
       }
       if (themeData.background_color || themeData.bgSoft) {
         style.setProperty("--bg-soft", themeData.background_color || themeData.bgSoft);
+        style.setProperty("--bg-page", themeData.background_color || themeData.bgSoft);
       }
     }
 
@@ -209,9 +213,9 @@
       document.body.style.fontFamily = `var(--font-family)`;
     }
 
-    const finalLogo = logoUrl || localStorage.getItem("gym_logo") || "/static/1000920458.png";
+    const finalLogo = logoUrl || localStorage.getItem("gym_logo");
     if (finalLogo) {
-      document.querySelectorAll("[data-gym-logo], .gym-logo-img, #headerAvatar img, .gymchat-head img").forEach(img => {
+      document.querySelectorAll("[data-gym-logo], .gym-logo-img, #headerAvatar img, .gymchat-head img, #welcomeLogoWrap img").forEach(img => {
         if (img.tagName === "IMG") {
           img.src = finalLogo;
           img.style.display = "inline-block";
@@ -225,6 +229,11 @@
       const chatAvatar = document.getElementById("headerAvatar");
       if (chatAvatar) {
         chatAvatar.innerHTML = `<img src="${finalLogo}" alt="Logo" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" /><span class="online-indicator"></span>`;
+      }
+      // For welcome message logo container in chat body
+      const welcomeLogoWrap = document.getElementById("welcomeLogoWrap");
+      if (welcomeLogoWrap) {
+        welcomeLogoWrap.innerHTML = `<img src="${finalLogo}" alt="Logo" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" />`;
       }
       // For embedded chat widget header logo on public site
       const chatHeadLogo = document.querySelector(".gymchat-head div span:first-child");
