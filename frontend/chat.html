@@ -707,23 +707,27 @@ function renderLogo(logoUrl) {
   if (!logoUrl) {
     logoUrl = localStorage.getItem("gym_logo");
   }
-  if (!logoUrl) {
-    logoUrl = "/static/1000920458.png";
-  }
+
   const isImg = logoUrl && (
     logoUrl.startsWith("data:") ||
     logoUrl.startsWith("http") ||
     logoUrl.startsWith("/") ||
     logoUrl.startsWith("./") ||
     /\.(png|jpg|jpeg|svg|webp)/i.test(logoUrl) ||
-    logoUrl.length > 5
+    logoUrl.length > 20
   );
+
+  const welcomeWrap = document.getElementById("welcomeLogoWrap");
   if (isImg) {
-    headerAvatar.innerHTML = `<img src="${logoUrl}" alt="${escapeHtml(GYM_NAME)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML='🏋️<span class=\\'online-indicator\\'></span>'" /><span class="online-indicator"></span>`;
-  } else if (logoUrl && logoUrl.length <= 4) {
-    headerAvatar.innerHTML = `<span style="font-size:22px;">${escapeHtml(logoUrl)}</span><span class="online-indicator"></span>`;
+    headerAvatar.innerHTML = `<img src="${logoUrl}" alt="Gym Logo" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML='🏋️<span class=\\'online-indicator\\'></span>'" /><span class="online-indicator"></span>`;
+    if (welcomeWrap) {
+      welcomeWrap.innerHTML = `<img src="${logoUrl}" alt="Gym Logo" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" />`;
+    }
   } else {
     headerAvatar.innerHTML = `<span id="headerAvatarIcon">🏋️</span><span class="online-indicator"></span>`;
+    if (welcomeWrap) {
+      welcomeWrap.innerHTML = `<span style="font-size:20px;">🏋️</span>`;
+    }
   }
 
   // Synchronize Favicon link
@@ -738,6 +742,7 @@ function renderLogo(logoUrl) {
     favicon.href = logoUrl;
   }
 }
+
 
 async function loadGymInfo(){
   renderLogo(localStorage.getItem("gym_logo"));

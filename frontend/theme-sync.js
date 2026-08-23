@@ -167,35 +167,38 @@
 
   function applyTheme(themeData, fontName, logoUrl, gymName) {
     const root = document.documentElement;
-    const style = root.style;    if (themeData) {
-      if (themeData.primary_color || themeData.primary) {
-        const p = themeData.primary_color || themeData.primary;
+    const style = root.style;
+    if (themeData) {
+      const p = themeData.primary_color || themeData.primary;
+      if (p) {
         style.setProperty("--primary", p);
         style.setProperty("--accent", p);
         style.setProperty("--accent-primary", p);
         style.setProperty("--button-bg", p);
       }
-      if (themeData.secondary_color || themeData.secondary) {
-        const s = themeData.secondary_color || themeData.secondary;
+      const s = themeData.secondary_color || themeData.secondary;
+      if (s) {
         style.setProperty("--secondary", s);
         style.setProperty("--bg-dark", s);
-        style.setProperty("--header-bg", s);
       }
-      if (themeData.chatbot_header_color || themeData.chatHeaderBg) {
-        const h = themeData.chatbot_header_color || themeData.chatHeaderBg;
+      const h = themeData.chatbot_header_color || themeData.chatHeaderBg || s || p;
+      if (h) {
         style.setProperty("--header-bg", h);
         style.setProperty("--wa-header-bg", h);
       }
-      if (themeData.user_msg_color || themeData.userMsgBg) {
-        const u = themeData.user_msg_color || themeData.userMsgBg;
+      const u = themeData.user_msg_color || themeData.userMsgBg || p;
+      if (u) {
         style.setProperty("--user-msg-bg", u);
+        // If user bubble matches primary color, set user text to white for contrast
+        if (!themeData.user_msg_text && u === p) {
+          style.setProperty("--user-msg-text", "#ffffff");
+        }
       }
       if (themeData.user_msg_text || themeData.userMsgText) {
         style.setProperty("--user-msg-text", themeData.user_msg_text || themeData.userMsgText);
       }
       if (themeData.bot_msg_color || themeData.botMsgBg) {
-        const b = themeData.bot_msg_color || themeData.botMsgBg;
-        style.setProperty("--bot-msg-bg", b);
+        style.setProperty("--bot-msg-bg", themeData.bot_msg_color || themeData.botMsgBg);
       }
       if (themeData.bot_msg_text || themeData.botMsgText) {
         style.setProperty("--bot-msg-text", themeData.bot_msg_text || themeData.botMsgText);
@@ -205,6 +208,7 @@
         style.setProperty("--bg-page", themeData.background_color || themeData.bgSoft);
       }
     }
+
 
     const finalFont = fontName || (themeData && (themeData.font_family || themeData.font));
     if (finalFont) {
