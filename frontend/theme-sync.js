@@ -292,22 +292,26 @@
       const res = await fetch(`${getApiBase()}/api/gym/${gymId}/info`);
       if (res.ok) {
         const data = await res.json();
-        const serverTheme = data.theme || {};
-        const serverFont = serverTheme.font_family || localFont || "Inter";
+        const serverTheme = (data.theme && Object.keys(data.theme).length) ? data.theme : {};
+        const mergedTheme = Object.keys(serverTheme).length ? { ...(local || {}), ...serverTheme } : (local || {});
+        const serverFont = mergedTheme.font_family || mergedTheme.font || localFont || "Inter";
         const serverLogo = data.logo_url || localLogo;
         const serverName = data.gym_name || localName;
 
-        localStorage.setItem("gym_theme_config", JSON.stringify(serverTheme));
+        if (Object.keys(mergedTheme).length) {
+          localStorage.setItem("gym_theme_config", JSON.stringify(mergedTheme));
+        }
         if (serverFont) localStorage.setItem("gym_font", serverFont);
         if (serverLogo) localStorage.setItem("gym_logo", serverLogo);
         if (serverName) localStorage.setItem("gym_name", serverName);
 
-        applyTheme(serverTheme, serverFont, serverLogo, serverName);
+        applyTheme(mergedTheme, serverFont, serverLogo, serverName);
       }
     } catch (err) {
       console.warn("Theme-sync server fetch fallback:", err);
     }
   }
+
 
   // Hamburger Menu Component Initialization
   function initHamburgerMenu() {
