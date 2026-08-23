@@ -1739,7 +1739,14 @@ async function saveConfig(){
       enabled: Array.from(enabledSections),
       order: sectionOrder
     },
-    answers: Object.entries(answers).filter(([,v]) => v.situation_label && v.situation_label !== "__from_pdf__").map(([id, v]) => ({ id, situation_label: v.situation_label, field_values: v.field_values })),
+    answers: Object.entries(answers)
+      .filter(([,v]) => v && v.situation_label && v.situation_label !== "Unknown / not configured")
+      .map(([id, v]) => ({
+        id,
+        situation_label: v.situation_label,
+        field_values: v._pdfText ? { ...v.field_values, _pdfText: v._pdfText } : v.field_values || {}
+      })),
+
     custom_qa: customQA.filter(c => c.question.trim() && c.answer.trim()).map(c => ({ question: c.question.trim(), answer: c.answer.trim() })),
   };
   try{

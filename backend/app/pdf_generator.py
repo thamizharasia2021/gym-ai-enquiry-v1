@@ -65,16 +65,28 @@ def resolve_answers(config) -> list[dict]:
     for q in QA_SCHEMA:
         sel = selections.get(q["id"])
         answer_text = UNANSWERED_FALLBACK
-        if sel:
-            situation = next(
-                (s for s in q["situations"] if s["label"] == sel.situation_label), None
-            )
-            if situation:
-                text = situation["template"]
-                for field in situation["fields"]:
-                    val = sel.field_values.get(field, "").strip()
-                    text = text.replace("{" + field + "}", val if val else f"[{field} not set]")
-                answer_text = text
+        is_configured = False
+        if sel and sel.situation_label:
+            lbl = sel.situation_label.strip()
+            if lbl not in ("Unknown / not configured", "Unconfigured", ""):
+                situation = next((s for s in q["situations"] if s["label"] == lbl), None)
+                if situation:
+                    text = situation["template"]
+                    for field in situation["fields"]:
+                        val = sel.field_values.get(field, "").strip()
+                        text = text.replace("{" + field + "}", val if val else f"[{field} not set]")
+                    answer_text = text
+                    is_configured = True
+                elif sel.field_values.get("_pdfText"):
+                    answer_text = sel.field_values["_pdfText"]
+                    is_configured = True
+                elif sel.field_values.get("custom_text"):
+                    answer_text = sel.field_values["custom_text"]
+                    is_configured = True
+                elif lbl != "__from_pdf__":
+                    answer_text = lbl
+                    is_configured = True
+
         resolved.append({
             "id": q["id"],
             "category": q["category"],
@@ -82,9 +94,10 @@ def resolve_answers(config) -> list[dict]:
             "question": q["question"],
             "intent": q["intent"],
             "answer": answer_text,
-            "configured": sel is not None,
+            "configured": is_configured,
         })
     return resolved
+
 
 
 def _identity_dict(identity) -> dict:

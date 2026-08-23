@@ -291,36 +291,25 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
         return True
 
     client = _get_client()
-    try:
-        if client:
-            resp = client.models.generate_content(
-                model=config.GEMINI_CHAT_MODEL,
-                contents=contents,
-                config=types.GenerateContentConfig(**gen_config_kwargs),
-            )
-            raw_reply = resp.text.strip() if resp.text else f"Feel free to ask about facilities, membership plans, timings, or free trial at {gym_name}!"
-            # Clean accidental leading "Yes, " or "Yes facilities available" if present
-            reply_text = re.sub(r"^(?:yes,?\s+facilities\s+available\.?\s*)+", f"Here are the facilities available at {gym_name}:\n\n", raw_reply, flags=re.IGNORECASE)
-        else:
-            # Deterministic fallback formatting for category queries in offline mode
-            if matched_cats:
-                positive_facts = []
-                for c in chunks:
-                    ans = c.get("metadata", {}).get("answer", "").strip()
-                    if _is_positive_fact(ans):
-                        clean_ans = _clean_fact_text(ans)
-                        if clean_ans and clean_ans not in positive_facts:
-                            positive_facts.append(clean_ans)
-                if positive_facts:
-                    reply_text = f"Here are the facilities and details for {gym_name}:\n\n" + "\n".join(f"✓ {f}" for f in positive_facts[:10])
-                else:
-                    top_answer = _clean_fact_text(chunks[0]["metadata"].get("answer", "")) if (chunks and _is_positive_fact(chunks[0]["metadata"].get("answer", ""))) else ""
-                    reply_text = top_answer or f"Welcome to {gym_name}!"
-            else:
-                top_answer = _clean_fact_text(chunks[0]["metadata"].get("answer", "")) if (chunks and _is_positive_fact(chunks[0]["metadata"].get("answer", ""))) else ""
-                reply_text = top_answer or f"Welcome to {gym_name}! Ask us about facilities, plans, personal training, timings, or location."
-    except Exception as e:
-        # Fallback to structured facts
+    reply_text = None
+    if client:
+        candidate_models = [config.GEMINI_CHAT_MODEL, "gemini-1.5-flash", "gemini-2.0-flash-exp", "gemini-1.5-pro"]
+        for m_name in candidate_models:
+            try:
+                resp = client.models.generate_content(
+                    model=m_name,
+                    contents=contents,
+                    config=types.GenerateContentConfig(**gen_config_kwargs),
+                )
+                if resp and resp.text:
+                    raw_reply = resp.text.strip()
+                    reply_text = re.sub(r"^(?:yes,?\s+facilities\s+available\.?\s*)+", f"Here are the details for {gym_name}:\n\n", raw_reply, flags=re.IGNORECASE)
+                    break
+            except Exception as ex:
+                print(f"[Gemini Chat Warning] Model '{m_name}' failed: {ex}. Trying fallback model...")
+
+    if not reply_text:
+        # Deterministic fallback formatting for category queries in offline mode
         if matched_cats:
             positive_facts = []
             for c in chunks:
@@ -330,14 +319,14 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
                     if clean_ans and clean_ans not in positive_facts:
                         positive_facts.append(clean_ans)
             if positive_facts:
-                reply_text = f"Here are the details for {gym_name}:\n\n" + "\n".join(f"✓ {f}" for f in positive_facts[:8])
+                reply_text = f"Here are the details for {gym_name}:\n\n" + "\n".join(f"✓ {f}" for f in positive_facts[:10])
             else:
-                reply_text = f"We are here to help! Ask about facilities, plans, personal training, timings, or location at {gym_name}."
-        elif chunks and "text" in chunks[0]:
-            top_answer = _clean_fact_text(chunks[0]["metadata"].get("answer", "")) if _is_positive_fact(chunks[0]["metadata"].get("answer", "")) else ""
-            reply_text = top_answer or f"We are here to help! Ask about facilities, plans, personal training, timings, or location at {gym_name}."
+                top_answer = _clean_fact_text(chunks[0]["metadata"].get("answer", "")) if (chunks and _is_positive_fact(chunks[0]["metadata"].get("answer", ""))) else ""
+                reply_text = top_answer or f"Welcome to {gym_name}!"
         else:
-            reply_text = f"We are here to help! Ask about facilities, plans, personal training, timings, or location at {gym_name}."
+            top_answer = _clean_fact_text(chunks[0]["metadata"].get("answer", "")) if (chunks and _is_positive_fact(chunks[0]["metadata"].get("answer", ""))) else ""
+            reply_text = top_answer or f"Welcome to {gym_name}! Ask us about facilities, plans, personal training, timings, or location."
+
 
     # Clean any '✓ .' or '✓ .' patterns in reply_text
     reply_text = re.sub(r"✓\s*\.\s*", "✓ ", reply_text)
