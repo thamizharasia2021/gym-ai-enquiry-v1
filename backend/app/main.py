@@ -615,6 +615,49 @@ def get_unread_lead_count(gym_id: str):
     return {"gym_id": gym_id, "unread_count": leads_manager.get_unread_count(gym_id)}
 
 
+@app.post("/api/gym/{gym_id}/test-email")
+def test_email_notification(gym_id: str, payload: Optional[dict] = Body(None)):
+    """Tests email notification dispatch for the gym."""
+    ident = _gym_identity(gym_id)
+    target_email = (payload or {}).get("email") or ident.get("email") or config.OWNER_NOTIFICATION_EMAIL
+    
+    if not config.SMTP_HOST:
+        return {
+            "status": "error",
+            "smtp_configured": False,
+            "message": "SMTP_HOST environment variable is not configured on Render yet.",
+            "target_email": target_email or "not set"
+        }
+    
+    if not target_email:
+        return {
+            "status": "error",
+            "smtp_configured": True,
+            "message": "No target recipient email configured. Set contact email in Website Essentials & Gym Profile.",
+            "target_email": None
+        }
+
+    subject = f"🧪 Test Email Alert — {ident.get('gym_name', 'Tarvos Fit')}"
+    text = "This is a test notification from your Gym AI Assistant."
+    html = f"""
+    <div style="font-family:sans-serif;padding:20px;border:1px solid #e2e8f0;border-radius:12px;">
+      <h2 style="color:#16a34a;">✅ Email Notification Test Successful!</h2>
+      <p>Your Gym AI Assistant email alert pipeline is working correctly.</p>
+      <p><strong>Gym:</strong> {ident.get('gym_name', 'Tarvos Fit')}</p>
+      <p><strong>Recipient:</strong> {target_email}</p>
+    </div>
+    """
+    ok, msg = leads_manager._send_smtp_email(target_email, subject, text, html)
+    return {
+        "status": "success" if ok else "failed",
+        "smtp_configured": True,
+        "email_sent": ok,
+        "message": msg,
+        "target_email": target_email
+    }
+
+
+
 # ------------------------------------------------ Verified Integrations API ---
 class GoogleSyncPayload(BaseModel):
     place_id: Optional[str] = None
