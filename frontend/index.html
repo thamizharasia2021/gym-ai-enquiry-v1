@@ -495,7 +495,69 @@ function renderNav(){
   });
 }
 
-// ----------------------------------------------------------- identity -----
+function compressImageFile(file, maxWidth = 1024, maxHeight = 1024, quality = 0.82) {
+  return new Promise((resolve) => {
+    if (!file) { resolve(null); return; }
+    if (file.type === "image/svg+xml" || file.name.endsWith(".svg")) {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    const isPng = file.type === "image/png" || file.name.endsWith(".png");
+    const mimeType = isPng ? "image/png" : "image/jpeg";
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (!w || !h) { resolve(e.target.result); return; }
+        if (w > maxWidth || h > maxHeight) {
+          if (w > h) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
+          else { w = Math.round((w * maxHeight) / h); h = maxHeight; }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!isPng) {
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, w, h);
+        }
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL(mimeType, quality));
+      };
+      img.onerror = () => resolve(e.target.result);
+      img.src = e.target.result;
+    };
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleLogoUploadEvent(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  if(file.size > 10 * 1024 * 1024){
+    alert("Please choose a logo file under 10MB.");
+    e.target.value = "";
+    return;
+  }
+  const compressed = await compressImageFile(file, 500, 500, 0.9);
+  if(compressed){
+    theme.logoDataUrl = compressed;
+    theme.logoName = file.name;
+    identity.logo_url = compressed;
+    localStorage.setItem("gym_logo", compressed);
+    localStorage.setItem("gym_name", identity.gym_name || "Tarvos Fit");
+    saveToLocalStorage();
+    renderAll();
+    setStatus("Logo updated successfully!");
+  }
+}
+
 function saveToLocalStorage(){
   try{
     localStorage.setItem("gym_identity_" + gymId(), JSON.stringify(identity));
@@ -513,6 +575,7 @@ function saveToLocalStorage(){
     }
   }catch(e){}
 }
+
 
 
 function restoreFromLocalStorage(){
@@ -557,7 +620,8 @@ function renderIdentity(){
     { key: "website", label: "Website Domain URL", placeholder: "https://tarvos.fit", icon: "🌐" },
   ];
 
-  let html = `
+    const currentLogo = identity.logo_url || theme.logoDataUrl;
+    let html = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
       <div>
         <h2 class="page-title">Website Essentials & Gym Profile</h2>
@@ -566,6 +630,25 @@ function renderIdentity(){
       <span style="background:#dcfce7;color:#15803d;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;">
         ✓ Auto-Saved Locally
       </span>
+    </div>
+
+    <!-- Gym Logo Card -->
+    <div class="card" style="margin-bottom:16px;background:#ffffff;">
+      <h3 style="margin:0 0 6px;font-size:14.5px;font-weight:700;">Gym / Brand Logo</h3>
+      <p class="site-preview-note" style="margin-top:0;">Your logo appears on the website navigation header, hero banner, AI chatbot avatar, and leads portal.</p>
+      <div style="display:flex;align-items:center;gap:18px;margin-top:10px;">
+        <div id="identityLogoPreview" style="width:72px;height:72px;border-radius:12px;border:2px dashed #cbd5e1;background:#f8fafc;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px;">
+          ${currentLogo ? `<img src="${currentLogo}" alt="Gym Logo" style="max-width:100%;max-height:100%;object-fit:contain;"/>` : `<span style="font-size:28px;">🏋️</span>`}
+        </div>
+        <div>
+          <label class="btn secondary small" style="cursor:pointer;display:inline-block;">
+            ${currentLogo ? "Replace Logo Image" : "Upload Logo Image"}
+            <input type="file" id="identityLogoUpload" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;"/>
+          </label>
+          ${currentLogo ? `<button class="btn ghost small" id="removeIdentityLogoBtn" style="margin-left:8px;">Remove Logo</button>` : ""}
+          <div class="site-preview-note" style="margin-top:6px;">Supported: PNG, SVG, JPEG (transparent PNGs & SVGs supported).</div>
+        </div>
+      </div>
     </div>
 
     <div class="card identity" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px;">`;
@@ -606,6 +689,19 @@ function renderIdentity(){
     </div>`;
 
   contentEl.innerHTML = html;
+
+  const logoInp = document.getElementById("identityLogoUpload");
+  if(logoInp) logoInp.addEventListener("change", handleLogoUploadEvent);
+  const removeLogoBtn = document.getElementById("removeIdentityLogoBtn");
+  if(removeLogoBtn) removeLogoBtn.addEventListener("click", () => {
+    theme.logoDataUrl = null;
+    theme.logoName = "";
+    identity.logo_url = null;
+    localStorage.removeItem("gym_logo");
+    saveToLocalStorage();
+    renderAll();
+  });
+
   contentEl.querySelectorAll("[data-identity]").forEach(inp => {
     inp.addEventListener("input", () => {
       identity[inp.dataset.identity] = inp.value;
@@ -617,6 +713,7 @@ function renderIdentity(){
     });
   });
 }
+
 
 // -------------------------------------------------- photo gallery tab ----
 function renderGallery(){
@@ -685,32 +782,9 @@ function renderGallery(){
 
   // Event handlers
   const fileInp = document.getElementById("galleryFileInput");
-  function compressImageFile(file, maxWidth = 1024, maxHeight = 1024, quality = 0.82) {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          let w = img.width, h = img.height;
-          if (w > maxWidth || h > maxHeight) {
-            if (w > h) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
-            else { w = Math.round((w * maxHeight) / h); h = maxHeight; }
-          }
-          const canvas = document.createElement("canvas");
-          canvas.width = w; canvas.height = h;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL("image/jpeg", quality));
-        };
-        img.onerror = () => resolve(e.target.result);
-        img.src = e.target.result;
-      };
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(file);
-    });
-  }
 
   if(fileInp){
+
     fileInp.addEventListener("change", async (e) => {
       const files = Array.from(e.target.files);
       if(!files.length) return;
@@ -1316,40 +1390,29 @@ function renderTheme(){
     }
   });
 
-  document.getElementById("genFromThemeBtn").addEventListener("click", generateWebsite);
-  document.getElementById("saveThemeBtn").addEventListener("click", async () => {
+  const genBtn = document.getElementById("genFromThemeBtn");
+  if(genBtn) genBtn.addEventListener("click", generateWebsite);
+
+  const saveThemeBtn = document.getElementById("saveThemeBtn");
+  if(saveThemeBtn) saveThemeBtn.addEventListener("click", async () => {
     await saveConfig();
     setStatus("Saved branding theme.");
   });
 
-  document.getElementById("logoUpload").addEventListener("change", async (e) => {
-    const file = e.target.files[0];
-    if(!file) return;
-    if(file.size > 5 * 1024 * 1024){
-      alert("Please choose a logo file under 5MB.");
-      e.target.value = "";
-      return;
-    }
-    const compressed = await compressImageFile(file, 400, 400, 0.88);
-    if(compressed){
-      theme.logoDataUrl = compressed;
-      theme.logoName = file.name;
-      identity.logo_url = compressed;
-      saveToLocalStorage();
-      renderAll();
-    }
-  });
-
+  const logoUploadInp = document.getElementById("logoUpload");
+  if(logoUploadInp) logoUploadInp.addEventListener("change", handleLogoUploadEvent);
 
   const removeBtn = document.getElementById("removeLogoBtn");
   if(removeBtn) removeBtn.addEventListener("click", () => {
     theme.logoDataUrl = null;
     theme.logoName = "";
     identity.logo_url = null;
+    localStorage.removeItem("gym_logo");
     saveToLocalStorage();
     renderAll();
   });
 }
+
 
 // --------------------------------------------------------- Q&A category ---
 // -------------------------------------------------- checklist detection ---
