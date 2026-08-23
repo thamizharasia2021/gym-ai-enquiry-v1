@@ -158,8 +158,13 @@ def save_config(gym_id: str, cfg: GymConfig):
             if "theme" not in cur_ident or not isinstance(cur_ident["theme"], dict):
                 cur_ident["theme"] = {}
             cur_ident["theme"].update(cfg.theme.model_dump())
+            if cfg.theme.logoDataUrl and not cur_ident.get("logo_url"):
+                cur_ident["logo_url"] = cfg.theme.logoDataUrl
+        if not cur_ident.get("logo_url") and cfg.identity.logo_url:
+            cur_ident["logo_url"] = cfg.identity.logo_url
         with open(ident_path, "w", encoding="utf-8") as f:
             json.dump(cur_ident, f, indent=2)
+
     except Exception:
         pass
 
@@ -356,12 +361,18 @@ def _gym_identity(gym_id: str) -> dict:
                     ident["theme"].update(saved_ident["theme"])
                 for k, v in saved_ident.items():
                     if k != "theme":
-                        ident[k] = v
+                        if v is not None and v != "":
+                            ident[k] = v
         except Exception:
             pass
 
+    # Ensure logo_url is preserved from theme if not set directly in identity
+    if not ident.get("logo_url") and isinstance(ident.get("theme"), dict) and ident["theme"].get("logoDataUrl"):
+        ident["logo_url"] = ident["theme"]["logoDataUrl"]
+
     if not ident.get("gym_name"):
         ident["gym_name"] = "Tarvos Fit" if "tarvos" in gym_id.lower() else gym_id.replace("-", " ").title()
+
     if not ident.get("website"):
         ident["website"] = f"https://{config.APP_DOMAIN}"
 

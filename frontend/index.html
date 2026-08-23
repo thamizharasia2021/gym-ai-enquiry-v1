@@ -504,8 +504,16 @@ function saveToLocalStorage(){
     localStorage.setItem("gym_theme_" + gymId(), JSON.stringify(theme));
     localStorage.setItem("gym_sections_order_" + gymId(), JSON.stringify(sectionOrder));
     localStorage.setItem("gym_sections_enabled_" + gymId(), JSON.stringify([...enabledSections]));
+    const logoVal = identity.logo_url || theme.logoDataUrl;
+    if(logoVal){
+      localStorage.setItem("gym_logo", logoVal);
+    }
+    if(identity.gym_name){
+      localStorage.setItem("gym_name", identity.gym_name);
+    }
   }catch(e){}
 }
+
 
 function restoreFromLocalStorage(){
   try{
@@ -1731,10 +1739,12 @@ async function loadSchema(){
 async function saveConfig(){
   setStatus("Generating knowledge PDF & indexing embeddings...");
   saveToLocalStorage();
+  const logoUrlVal = identity.logo_url || theme.logoDataUrl || null;
   const payload = {
     gym_id: gymId(),
-    identity: { ...identity, logo_url: theme.logoDataUrl || null },
-    theme: theme,
+    identity: { ...identity, logo_url: logoUrlVal },
+    theme: { ...theme, logoDataUrl: logoUrlVal, font_family: theme.font || "Inter" },
+
     sections: {
       enabled: Array.from(enabledSections),
       order: sectionOrder
