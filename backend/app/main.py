@@ -412,7 +412,7 @@ def _gym_identity(gym_id: str) -> dict:
 
     if "instagram" not in ident or not ident["instagram"]:
         ident["instagram"] = {
-            "instagram_username": ident.get("instagram_url", "").split("/")[-1] if ident.get("instagram_url") else "tarvosfit",
+            "instagram_username": (ident.get("instagram_url") or "").strip("/").split("/")[-1] if ident.get("instagram_url") else "tarvos.fit",
             "instagram_url": ident.get("instagram_url"),
             "cached_media": [],
             "last_synced_at": None,

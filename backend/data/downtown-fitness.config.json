@@ -15,7 +15,7 @@
     "currency": "INR",
     "city": "Trivandrum",
     "google_maps_url": "https://maps.app.goo.gl/p6y2t84SyxYGhxnBA",
-    "instagram_url": "https://instagram.com/tarvosfit",
+    "instagram_url": "https://www.instagram.com/tarvos.fit",
     "logo_url": null,
     "member_count_range": "100-500",
     "theme": {
@@ -71,8 +71,8 @@
       "cached_reviews": []
     },
     "instagram": {
-      "instagram_username": "tarvosfit",
-      "instagram_url": "https://instagram.com/tarvosfit",
+      "instagram_username": "tarvos.fit",
+      "instagram_url": "https://www.instagram.com/tarvos.fit",
       "cached_media": []
     }
   },

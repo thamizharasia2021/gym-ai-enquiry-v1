@@ -107,7 +107,7 @@ def sync_instagram_media(gym_id: str, access_token: Optional[str] = None) -> dic
             "status": "fallback",
             "message": "Instagram Access Token not configured. Using public Instagram profile & oEmbed links.",
             "instagram_url": ident.get("instagram_url") or ig_cfg.get("instagram_url") or "https://instagram.com",
-            "instagram_username": ig_cfg.get("instagram_username") or (ident.get("instagram_url", "").split("/")[-1] if ident.get("instagram_url") else ""),
+            "instagram_username": ig_cfg.get("instagram_username") or ((ident.get("instagram_url") or "").strip("/").split("/")[-1] if ident.get("instagram_url") else ""),
             "transformation_url": ig_cfg.get("transformation_url") or ident.get("instagram_transformation_url"),
             "events_url": ig_cfg.get("events_url") or ident.get("instagram_events_url"),
             "about_url": ig_cfg.get("about_url") or ident.get("instagram_about_url"),

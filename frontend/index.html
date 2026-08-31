@@ -613,7 +613,7 @@ function renderIdentity(){
     { key: "email", label: "Contact Email", placeholder: "e.g. contact@tarvos.fit", icon: "✉️" },
     { key: "city", label: "City / Area", placeholder: "e.g. Trivandrum", icon: "🏙️" },
     { key: "google_maps_url", label: "Google Maps Location Link", placeholder: "https://maps.app.goo.gl/...", icon: "📍" },
-    { key: "instagram_url", label: "Instagram Main Profile Link", placeholder: "https://instagram.com/tarvosfit", icon: "📸" },
+    { key: "instagram_url", label: "Instagram Main Profile Link", placeholder: "https://www.instagram.com/tarvos.fit", icon: "📸" },
     { key: "instagram_transformation_url", label: "🔥 Transformations Post/Reel Link (oEmbed)", placeholder: "https://www.instagram.com/reel/C-xyz123/", icon: "🔥" },
     { key: "instagram_events_url", label: "🎉 Events & Challenges Post/Reel Link (oEmbed)", placeholder: "https://www.instagram.com/p/C-abc456/", icon: "🎉" },
     { key: "instagram_about_url", label: "ℹ️ About & Gym Tour Post/Reel Link (oEmbed)", placeholder: "https://www.instagram.com/reel/C-tour789/", icon: "ℹ️" },
@@ -2196,7 +2196,7 @@ async function generateWebsite(){
   const reviewsHref = reviewsUrlFromAnswers || identity.google_maps_url ||
     `https://www.google.com/search?q=${encodeURIComponent((identity.gym_name||"") + " reviews")}`;
 
-  const instaHref = identity.instagram_url || `https://instagram.com/tarvosfit`;
+  const instaHref = identity.instagram_url || `https://www.instagram.com/tarvos.fit`;
   const instaHandle = identity.instagram_url ? identity.instagram_url.split("/").filter(Boolean).pop() : (identity.brand_name || identity.gym_name || "fitness").toLowerCase().replace(/[^a-z0-9]/g,"");
 
   const planRows = PLAN_DEFS
