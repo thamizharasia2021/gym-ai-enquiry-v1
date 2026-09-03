@@ -17,7 +17,7 @@ A production-ready, highly secure RAG-powered chatbot and web platform for **tar
    - Lead capture is executed directly through deterministic backend code (`POST /api/gym/{gym_id}/leads`).
    - In-chat phone detection intercepts contact numbers in code and returns instant confirmation without consuming LLM tokens.
 4. **Low-Cost Gemini Model**:
-   - Configured with `gemini-3.5-flash-lite` (ultra-fast, lightweight, state-of-the-art) and `gemini-embedding-001`.
+   - Configured with `gemini-2.0-flash` (fast, stable, low cost) and `gemini-embedding-001`.
 5. **High-Converting Website Generator**:
    - Generates a website for `tarvos.fit` featuring **Instagram Feed / Reels showcase**, **Interactive Google Maps Embed**, **Google Reviews Widget (4.9 ★)**, **1-Day Free Pass Lead Form**, and **Embedded Web Chat**.
 6. **Meta WhatsApp Cloud API Bot**:

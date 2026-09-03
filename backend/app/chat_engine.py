@@ -269,6 +269,8 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
         clean = re.sub(r"^(?:yes[\s,:\-–—]*)+", "", clean, flags=re.IGNORECASE).strip()
         # Strip leading dots, bullets, checkmarks, dashes, etc.
         clean = re.sub(r"^[.\s\-•✓:;,]+", "", clean).strip()
+        # Strip trailing isolated digit counts (e.g. ' 1', ' 0')
+        clean = re.sub(r"\s+\d+$", "", clean).strip()
         clean = re.sub(r"\s+", " ", clean).strip()
         if clean:
             clean = clean[0].upper() + clean[1:]
@@ -289,7 +291,7 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
     client = _get_client()
     reply_text = None
     if client:
-        candidate_models = [config.GEMINI_CHAT_MODEL, "gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-2.5-flash-lite"]
+        candidate_models = [config.GEMINI_CHAT_MODEL, "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash", "gemini-1.5-pro"]
         for m_name in candidate_models:
             try:
                 resp = client.models.generate_content(
