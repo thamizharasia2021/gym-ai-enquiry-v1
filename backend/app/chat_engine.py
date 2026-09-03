@@ -343,8 +343,22 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
             reply_text = top_answer or f"Welcome to {gym_name}! Ask us about facilities, plans, personal training, timings, or location."
 
 
-    # Clean any '✓ .' or '✓ .' patterns in reply_text
+    def _strip_markdown(text: str) -> str:
+        if not text:
+            return ""
+        # Strip headers like ###, ##, #
+        text = re.sub(r"^#{1,6}\s*", "", text, flags=re.MULTILINE)
+        # Strip bold and italics markers **, *, __, _
+        text = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
+        text = re.sub(r"\*([^*]+)\*", r"\1", text)
+        text = re.sub(r"__([^_]+)__", r"\1", text)
+        text = re.sub(r"_([^_]+)_", r"\1", text)
+        text = re.sub(r"`([^`]+)`", r"\1", text)
+        return text.strip()
+
+    # Clean any '✓ .' or '✓ .' patterns in reply_text and strip markdown
     reply_text = re.sub(r"✓\s*\.\s*", "✓ ", reply_text)
+    reply_text = _strip_markdown(reply_text)
 
     top_category = chunks[0]["metadata"].get("category") if chunks else None
     _log_chat_event(gym_id, session_id, top_category, lead_flag, channel)
