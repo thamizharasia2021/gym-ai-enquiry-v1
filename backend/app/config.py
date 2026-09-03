@@ -10,7 +10,7 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_EMBED_MODEL = os.getenv("GEMINI_EMBED_MODEL", "gemini-embedding-001")
 GEMINI_CHAT_MODEL = os.getenv("GEMINI_CHAT_MODEL", "gemini-3.5-flash")
-CHAT_TEMPERATURE = float(os.getenv("CHAT_TEMPERATURE", "0.4"))  # Configured 0.3 - 0.5
+CHAT_TEMPERATURE = float(os.getenv("CHAT_TEMPERATURE", "0.0"))  # 100% deterministic & grounded
 EMBED_DIM = int(os.getenv("EMBED_DIM", "768"))
 
 # Domain & Routing configuration

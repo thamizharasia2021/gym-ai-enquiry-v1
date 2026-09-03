@@ -299,42 +299,46 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
             return False
         return True
 
-    client = _get_client()
     reply_text = None
-    if client:
-        candidate_models = [config.GEMINI_CHAT_MODEL, "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash", "gemini-1.5-pro"]
-        for m_name in candidate_models:
-            try:
-                resp = client.models.generate_content(
-                    model=m_name,
-                    contents=contents,
-                    config=types.GenerateContentConfig(**gen_config_kwargs),
-                )
-                if resp and resp.text:
-                    raw_reply = resp.text.strip()
-                    reply_text = re.sub(r"^(?:yes,?\s+facilities\s+available\.?\s*)+", f"Here are the details for {gym_name}:\n\n", raw_reply, flags=re.IGNORECASE)
-                    break
-            except Exception as ex:
-                print(f"[Gemini Chat Warning] Model '{m_name}' failed: {ex}. Trying fallback model...")
+
+    # Deterministic 100% stable plain-text category output for button clicks & category queries
+    if matched_cats:
+        positive_facts = []
+        for c in chunks:
+            ans = c.get("metadata", {}).get("answer", "").strip()
+            if _is_positive_fact(ans):
+                clean_ans = _clean_fact_text(ans)
+                if clean_ans and clean_ans not in positive_facts:
+                    positive_facts.append(clean_ans)
+        if positive_facts:
+            reply_text = "\n".join(f"✓ {f}" for f in positive_facts)
+
+    # LLM fallback for open-ended queries outside button categories
+    if not reply_text:
+        client = _get_client()
+        if client:
+            gen_config_kwargs = dict(
+                system_instruction=SYSTEM_PROMPT_BASE.format(gym_name=gym_name, knowledge_block=knowledge_block),
+                temperature=config.CHAT_TEMPERATURE,
+                max_output_tokens=1200,
+            )
+            candidate_models = [config.GEMINI_CHAT_MODEL, "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash", "gemini-1.5-pro"]
+            for m_name in candidate_models:
+                try:
+                    resp = client.models.generate_content(
+                        model=m_name,
+                        contents=contents,
+                        config=types.GenerateContentConfig(**gen_config_kwargs),
+                    )
+                    if resp and resp.text:
+                        reply_text = resp.text.strip()
+                        break
+                except Exception as ex:
+                    print(f"[Gemini Chat Warning] Model '{m_name}' failed: {ex}. Trying fallback model...")
 
     if not reply_text:
-        # Deterministic fallback formatting for category queries in offline mode
-        if matched_cats:
-            positive_facts = []
-            for c in chunks:
-                ans = c.get("metadata", {}).get("answer", "").strip()
-                if _is_positive_fact(ans):
-                    clean_ans = _clean_fact_text(ans)
-                    if clean_ans and clean_ans not in positive_facts:
-                        positive_facts.append(clean_ans)
-            if positive_facts:
-                reply_text = f"Here are the details for {gym_name}:\n\n" + "\n".join(f"✓ {f}" for f in positive_facts[:10])
-            else:
-                top_answer = _clean_fact_text(chunks[0]["metadata"].get("answer", "")) if (chunks and _is_positive_fact(chunks[0]["metadata"].get("answer", ""))) else ""
-                reply_text = top_answer or f"Welcome to {gym_name}!"
-        else:
-            top_answer = _clean_fact_text(chunks[0]["metadata"].get("answer", "")) if (chunks and _is_positive_fact(chunks[0]["metadata"].get("answer", ""))) else ""
-            reply_text = top_answer or f"Welcome to {gym_name}! Ask us about facilities, plans, personal training, timings, or location."
+        top_answer = _clean_fact_text(chunks[0]["metadata"].get("answer", "")) if (chunks and _is_positive_fact(chunks[0]["metadata"].get("answer", ""))) else ""
+        reply_text = top_answer or f"Welcome to {gym_name}! Ask us about facilities, plans, personal training, timings, or location."
 
 
     def _strip_markdown(text: str) -> str:
