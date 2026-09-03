@@ -239,9 +239,30 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
 
     # Determine matched categories for comprehensive category-wide retrieval
     matched_cats = set()
-    for kw, cat_list in CATEGORY_MAPPINGS.items():
-        if kw in user_low:
-            matched_cats.update(cat_list)
+    if any(p in user_low for p in ["equipment", "free weights", "cardio machines", "racks"]):
+        matched_cats.add("Equipment")
+    elif any(p in user_low for p in ["facilities", "amenities"]):
+        matched_cats.add("Parking & Facilities")
+    elif any(p in user_low for p in ["workout programs", "group classes"]):
+        matched_cats.add("Classes & Programs")
+    elif any(p in user_low for p in ["membership plans", "membership fee", "pricing"]):
+        matched_cats.add("Membership & Offers")
+    elif any(p in user_low for p in ["timings", "working hours", "opening hours"]):
+        matched_cats.add("Timings & Crowd")
+    elif any(p in user_low for p in ["personal trainers", "coaching packages"]):
+        matched_cats.add("PT & Trainers")
+    elif any(p in user_low for p in ["located", "gym location"]):
+        matched_cats.add("Gym & Location")
+    elif any(p in user_low for p in ["gym rules", "hygiene standards", "dress code"]):
+        matched_cats.add("Policies / Hygiene")
+    elif any(p in user_low for p in ["injuries", "health conditions", "diet guidance"]):
+        matched_cats.add("Health, Injury & Diet")
+    elif any(p in user_low for p in ["nutrition products", "supplements"]):
+        matched_cats.add("Nutrition Products")
+    else:
+        for kw, cat_list in CATEGORY_MAPPINGS.items():
+            if kw in user_low:
+                matched_cats.update(cat_list)
 
     # 1. Standard semantic search
     chunks = store.search(user_message, top_k=25 if matched_cats else config.TOP_K)
