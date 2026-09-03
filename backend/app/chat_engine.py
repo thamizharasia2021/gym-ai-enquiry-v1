@@ -102,9 +102,7 @@ def _log_chat_event(gym_id: str, session_id: str, category: str | None, lead_fla
 
 
 CATEGORY_MAPPINGS = {
-    "facilit": ["Parking & Facilities", "Equipment", "Policies / Hygiene"],
-    "amenit": ["Parking & Facilities", "Equipment"],
-    "equip": ["Equipment", "Parking & Facilities"],
+    "equip": ["Equipment"],
     "dumbbell": ["Equipment"],
     "barbell": ["Equipment"],
     "treadmill": ["Equipment"],
@@ -113,17 +111,32 @@ CATEGORY_MAPPINGS = {
     "smith": ["Equipment"],
     "machine": ["Equipment"],
     "cable": ["Equipment"],
-    "cardio": ["Equipment", "Classes & Programs"],
-    "weight": ["Equipment", "Classes & Programs"],
+    "cardio": ["Equipment"],
+    "weight": ["Equipment"],
+    "kettlebell": ["Equipment"],
+    "pulldown": ["Equipment"],
+    "press": ["Equipment"],
+    "facilit": ["Parking & Facilities"],
+    "amenit": ["Parking & Facilities"],
+    "parking": ["Parking & Facilities"],
+    "locker": ["Parking & Facilities"],
+    "shower": ["Parking & Facilities"],
+    "water": ["Parking & Facilities"],
+    "wifi": ["Parking & Facilities"],
+    "wi-fi": ["Parking & Facilities"],
+    "sauna": ["Parking & Facilities"],
+    "steam": ["Parking & Facilities"],
+    "ac": ["Parking & Facilities"],
+    "cctv": ["Parking & Facilities"],
+    "restroom": ["Parking & Facilities"],
+    "changing": ["Parking & Facilities"],
     "health": ["Health, Injury & Diet"],
     "injur": ["Health, Injury & Diet"],
     "pain": ["Health, Injury & Diet"],
-    "back": ["Health, Injury & Diet"],
-    "knee": ["Health, Injury & Diet"],
     "rehab": ["Health, Injury & Diet"],
     "medic": ["Health, Injury & Diet"],
-    "diet": ["Health, Injury & Diet", "Nutrition Products"],
-    "nutrit": ["Nutrition Products", "Health, Injury & Diet"],
+    "diet": ["Health, Injury & Diet"],
+    "nutrit": ["Nutrition Products"],
     "supplement": ["Nutrition Products"],
     "protein": ["Nutrition Products"],
     "whey": ["Nutrition Products"],
@@ -138,18 +151,19 @@ CATEGORY_MAPPINGS = {
     "dress": ["Policies / Hygiene"],
     "shoe": ["Policies / Hygiene"],
     "towel": ["Policies / Hygiene"],
-    "clean": ["Policies / Hygiene", "Parking & Facilities"],
+    "clean": ["Policies / Hygiene"],
     "sanit": ["Policies / Hygiene"],
     "guest": ["Policies / Hygiene"],
-    "refund": ["Policies / Hygiene", "Membership & Offers"],
-    "cancel": ["Policies / Hygiene", "Membership & Offers"],
-    "freeze": ["Policies / Hygiene", "Membership & Offers"],
-    "plan": ["Membership & Offers", "Trial & Joining"],
-    "membership": ["Membership & Offers", "Trial & Joining"],
+    "refund": ["Policies / Hygiene"],
+    "cancel": ["Policies / Hygiene"],
+    "freeze": ["Policies / Hygiene"],
+    "plan": ["Membership & Offers"],
+    "membership": ["Membership & Offers"],
     "price": ["Membership & Offers"],
     "pricing": ["Membership & Offers"],
     "fee": ["Membership & Offers"],
     "cost": ["Membership & Offers"],
+    "offer": ["Membership & Offers"],
     "timing": ["Timings & Crowd"],
     "hour": ["Timings & Crowd"],
     "slot": ["Timings & Crowd"],
@@ -160,14 +174,17 @@ CATEGORY_MAPPINGS = {
     "zumba": ["Classes & Programs"],
     "yoga": ["Classes & Programs"],
     "crossfit": ["Classes & Programs"],
+    "hiit": ["Classes & Programs"],
+    "tabata": ["Classes & Programs"],
+    "mma": ["Classes & Programs"],
+    "boxing": ["Classes & Programs"],
+    "kickboxing": ["Classes & Programs"],
     "trainer": ["PT & Trainers"],
     "coach": ["PT & Trainers"],
+    "personal training": ["PT & Trainers"],
     "location": ["Gym & Location"],
     "address": ["Gym & Location"],
     "map": ["Gym & Location"],
-    "parking": ["Parking & Facilities"],
-    "locker": ["Parking & Facilities", "Policies / Hygiene"],
-    "shower": ["Parking & Facilities", "Policies / Hygiene"],
 }
 
 
@@ -303,8 +320,14 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
 
     # Deterministic 100% stable plain-text category output for button clicks & category queries
     if matched_cats:
+        matched_codes = {CAT_NAME_TO_CODE.get(name, name) for name in matched_cats}
+        category_chunks = [
+            c for c in store.chunks
+            if c.get("metadata", {}).get("category") in matched_cats
+            or c.get("metadata", {}).get("category") in matched_codes
+        ]
         positive_facts = []
-        for c in chunks:
+        for c in category_chunks:
             ans = c.get("metadata", {}).get("answer", "").strip()
             if _is_positive_fact(ans):
                 clean_ans = _clean_fact_text(ans)
