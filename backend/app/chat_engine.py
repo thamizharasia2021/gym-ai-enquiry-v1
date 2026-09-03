@@ -259,10 +259,6 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
         temperature=config.CHAT_TEMPERATURE,
         max_output_tokens=600,
     )
-    if hasattr(types, "ThinkingConfig"):
-        gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
-    else:
-        gen_config_kwargs["max_output_tokens"] = 600
 
     def _clean_fact_text(raw_text: str) -> str:
         if not raw_text:
@@ -293,7 +289,7 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
     client = _get_client()
     reply_text = None
     if client:
-        candidate_models = [config.GEMINI_CHAT_MODEL, "gemini-1.5-flash", "gemini-2.0-flash-exp", "gemini-1.5-pro"]
+        candidate_models = [config.GEMINI_CHAT_MODEL, "gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-2.5-flash-lite"]
         for m_name in candidate_models:
             try:
                 resp = client.models.generate_content(
