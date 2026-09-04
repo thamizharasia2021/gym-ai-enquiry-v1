@@ -1,37 +1,78 @@
 {
   "gym_name": "Tarvos Fit",
-  "brand_name": null,
-  "short_description": null,
-  "detailed_description": null,
-  "primary_phone": null,
-  "whatsapp_number": null,
-  "email": null,
-  "website": null,
+  "brand_name": "Tarvos Fit",
+  "short_description": "Premier Fitness & Personal Training Center in Pappanamcode, Trivandrum",
+  "primary_phone": "+91 70128 54261",
+  "whatsapp_number": "+91 73565 51321",
+  "email": "admin@tarvosfitness.com",
+  "website": "https://tarvos.fit",
+  "city": "Pappanamcode, Trivandrum",
+  "google_maps_url": "https://maps.app.goo.gl/p6y2t84SyxYGhxnBA",
+  "instagram_url": "https://instagram.com/tarvosfit",
+  "instagram_transformation_url": null,
+  "instagram_events_url": null,
+  "instagram_about_url": null,
+  "member_count_range": "100-500",
+  "gallery": [
+    {
+      "id": "g1",
+      "url": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop",
+      "caption": "Premium Strength & Free Weights Zone",
+      "category": "Gym Floor"
+    },
+    {
+      "id": "g2",
+      "url": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800&auto=format&fit=crop",
+      "caption": "Heavy Dumbbells & Olympic Barbells",
+      "category": "Equipment"
+    },
+    {
+      "id": "g3",
+      "url": "https://images.unsplash.com/photo-1576678927484-cc907957088c?q=80&w=800&auto=format&fit=crop",
+      "caption": "Cardio Endurance & Treadmills Suite",
+      "category": "Equipment"
+    },
+    {
+      "id": "g4",
+      "url": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=800&auto=format&fit=crop",
+      "caption": "1-on-1 Personal Training Coaching",
+      "category": "Training"
+    },
+    {
+      "id": "g5",
+      "url": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop",
+      "caption": "Functional Training & Mobility Studio",
+      "category": "Training"
+    },
+    {
+      "id": "g6",
+      "url": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800&auto=format&fit=crop",
+      "caption": "Member Body Transformation Spotlight",
+      "category": "Transformations"
+    }
+  ],
+  "detailed_description": "Transform your fitness with certified personal training, advanced equipment, and goal-oriented workout plans in Pappanamcode, Trivandrum.",
   "supported_languages": [
     "en"
   ],
   "currency": "INR",
-  "city": "Chennai",
-  "google_maps_url": null,
-  "instagram_url": null,
-  "instagram_transformation_url": null,
-  "instagram_events_url": null,
-  "instagram_about_url": null,
-  "logo_url": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0idGZHcmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzE2YTM0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxNTgwM2QiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiByeD0iNDQiIGZpbGw9InVybCgjdGZHcmFkKSIvPgogIDxyZWN0IHg9IjYiIHk9IjYiIHdpZHRoPSIxODgiIGhlaWdodD0iMTg4IiByeD0iMzgiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjI1KSIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAwLCA4NSkiPgogICAgPHJlY3QgeD0iLTY1IiB5PSItMTgiIHdpZHRoPSIxNCIgaGVpZ2h0PSIzNiIgcng9IjQiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuOTUiLz4KICAgIDxyZWN0IHg9Ii00NyIgeT0iLTI2IiB3aWR0aD0iMTIiIGhlaWdodD0iNTIiIHJ4PSI0IiBmaWxsPSIjZmZmZmZmIi8+CiAgICA8cmVjdCB4PSIzNSIgeT0iLTI2IiB3aWR0aD0iMTIiIGhlaWdodD0iNTIiIHJ4PSI0IiBmaWxsPSIjZmZmZmZmIi8+CiAgICA8cmVjdCB4PSI1MSIgeT0iLTE4IiB3aWR0aD0iMTQiIGhlaWdodD0iMzYiIHJ4PSI0IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjk1Ii8+CiAgICA8cmVjdCB4PSItMzUiIHk9Ii02IiB3aWR0aD0iNzAiIGhlaWdodD0iMTIiIHJ4PSIzIiBmaWxsPSIjZmZmZmZmIi8+CiAgICA8cGF0aCBkPSJNLTIyLC0yNCBDLTEwLC00MiAxMCwtNDIgMjIsLTI0IEMxNCwtMTQgNiwtOCAwLDQgQy02LC04IC0xNCwtMTQgLTIyLC0yNCBaIiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjkiLz4KICA8L2c+CiAgPHRleHQgeD0iMTAwIiB5PSIxNjIiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmb250LXNpemU9IjMyIiBmaWxsPSIjZmZmZmZmIiBsZXR0ZXItc3BhY2luZz0iMyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VEFSVk9TPC90ZXh0Pgo8L3N2Zz4=",
-  "member_count_range": null,
-  "gallery": [],
+  "logo_url": null,
   "theme": {
-    "primary_color": "#16a34a",
-    "secondary_color": "#0f172a",
-    "accent_color": "#22c55e",
+    "font": "Inter",
+    "preset_name": "crimson",
+    "primary_color": "#dc2626",
+    "secondary_color": "#1f2937",
+    "accent_color": "#b91c1c",
     "background_color": "#ffffff",
     "text_color": "#0f172a",
-    "button_color": "#16a34a",
-    "chatbot_header_color": "#0f172a",
-    "user_msg_color": "#16a34a",
-    "bot_msg_color": "#f1f5f9",
-    "font_family": "Outfit",
-    "preset_name": "emerald"
+    "button_color": "#dc2626",
+    "chatbot_header_color": "#1f2937",
+    "user_msg_color": "#dc2626",
+    "bot_msg_color": "#fef2f2",
+    "logoDataUrl": null,
+    "logoName": "",
+    "font_family": "Merriweather",
+    "palette": "emerald"
   },
   "sections": {
     "enabled_sections": [

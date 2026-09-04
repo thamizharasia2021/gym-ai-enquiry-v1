@@ -189,17 +189,17 @@ CATEGORY_MAPPINGS = {
 
 
 CAT_NAME_TO_CODE = {
-    "Gym & Location": "LOC",
-    "Timings & Crowd": "TIME",
-    "Membership & Offers": "MEM",
-    "Trial & Joining": "TRI",
-    "PT & Trainers": "TRN",
-    "Classes & Programs": "CLS",
-    "Equipment": "EQU",
-    "Parking & Facilities": "FAC",
-    "Policies / Hygiene": "POL",
-    "Health, Injury & Diet": "INJ",
-    "Nutrition Products": "NUT",
+    "Gym & Location": ["LOC"],
+    "Timings & Crowd": ["TIME"],
+    "Membership & Offers": ["MEM"],
+    "Trial & Joining": ["TRIAL", "TRI"],
+    "PT & Trainers": ["PT", "TRN"],
+    "Classes & Programs": ["CLS"],
+    "Equipment": ["EQP", "EQU"],
+    "Parking & Facilities": ["FAC"],
+    "Policies / Hygiene": ["POL"],
+    "Health, Injury & Diet": ["INJ"],
+    "Nutrition Products": ["NUT"],
 }
 
 def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | None = None, session_id: str = "", channel: str = "web") -> dict:
@@ -270,7 +270,13 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
 
     # 2. Add all matching category chunks so that all available features are in context
     if matched_cats:
-        matched_codes = {CAT_NAME_TO_CODE.get(name, name) for name in matched_cats}
+        matched_codes = set()
+        for name in matched_cats:
+            codes = CAT_NAME_TO_CODE.get(name, [name])
+            if isinstance(codes, list):
+                matched_codes.update(codes)
+            else:
+                matched_codes.add(codes)
         for c in store.chunks:
             if c.get("id") not in seen_ids:
                 meta = c.get("metadata", {})
@@ -325,7 +331,7 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
             clean = clean[0].upper() + clean[1:]
         return clean
 
-    def _is_positive_fact(ans: str) -> bool:
+    def _is_positive_fact(ans: str, chunk: dict | None = None) -> bool:
         if not ans:
             return False
         low = ans.strip().lower()
@@ -333,15 +339,30 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
             return False
         if low.startswith("0 ") or low.startswith("no,") or low.startswith("no ") or low.startswith("we don't") or low.startswith("we do not") or low.startswith("sorry,"):
             return False
-        if "not available" in low or "not currently" in low or "i don't have confirmed" in low or "not provided" in low or "not offered" in low or "not set" in low or "0 steam" in low or "0 sauna" in low or "0 shower" in low or "0 locker" in low:
+        if "not available" in low or "not currently" in low or "i don't have confirmed" in low or "we do not have confirmed" in low or "don't have confirmed" in low or "do not have confirmed" in low or "no confirmed information" in low or "not provided" in low or "not offered" in low or "not set" in low or "0 steam" in low or "0 sauna" in low or "0 shower" in low or "0 locker" in low:
             return False
+        if re.search(r"\b0\s*$", low) or re.search(r"\.\s*0\b", low) or "available. 0" in low or "available 0" in low:
+            return False
+        if chunk and isinstance(chunk, dict):
+            meta = chunk.get("metadata", {})
+            fv = meta.get("field_values", {})
+            if isinstance(fv, dict):
+                for k, v in fv.items():
+                    if str(v).strip() in ("0", "none", "no", "false"):
+                        return False
         return True
 
     reply_text = None
 
     # Deterministic 100% stable plain-text category output for button clicks & category queries
     if matched_cats:
-        matched_codes = {CAT_NAME_TO_CODE.get(name, name) for name in matched_cats}
+        matched_codes = set()
+        for name in matched_cats:
+            codes = CAT_NAME_TO_CODE.get(name, [name])
+            if isinstance(codes, list):
+                matched_codes.update(codes)
+            else:
+                matched_codes.add(codes)
         category_chunks = [
             c for c in store.chunks
             if c.get("metadata", {}).get("category") in matched_cats
@@ -350,7 +371,7 @@ def answer(gym_id: str, gym_name: str, user_message: str, history: list[dict] | 
         positive_facts = []
         for c in category_chunks:
             ans = c.get("metadata", {}).get("answer", "").strip()
-            if _is_positive_fact(ans):
+            if _is_positive_fact(ans, c):
                 clean_ans = _clean_fact_text(ans)
                 if clean_ans and clean_ans not in positive_facts:
                     positive_facts.append(clean_ans)

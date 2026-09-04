@@ -14,7 +14,7 @@ CHAT_TEMPERATURE = float(os.getenv("CHAT_TEMPERATURE", "0.0"))  # 100% determini
 EMBED_DIM = int(os.getenv("EMBED_DIM", "768"))
 
 # Domain & Routing configuration
-APP_DOMAIN = os.getenv("APP_DOMAIN", "tarvos.fit")
+APP_DOMAIN = os.getenv("APP_DOMAIN", "tarvosfitness.com")
 CHAT_SUBDOMAIN = os.getenv("CHAT_SUBDOMAIN", f"chat.{APP_DOMAIN}")
 DEFAULT_GYM_ID = os.getenv("DEFAULT_GYM_ID", "tarvos-fit")
 ADMIN_KEY = os.getenv("ADMIN_KEY", "admin123")
@@ -47,7 +47,7 @@ SMTP_HOST = os.getenv("SMTP_HOST", "")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USER = os.getenv("SMTP_USER", "")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
-SMTP_FROM = os.getenv("SMTP_FROM", os.getenv("SMTP_USER", "noreply@tarvos.fit"))
+SMTP_FROM = os.getenv("SMTP_FROM", os.getenv("SMTP_USER", "noreply@tarvosfitness.com"))
 SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "true").lower() in ("true", "1", "yes")
 SMTP_USE_SSL = os.getenv("SMTP_USE_SSL", "false").lower() in ("true", "1", "yes")
 

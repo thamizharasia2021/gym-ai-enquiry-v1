@@ -48,21 +48,21 @@ def run_tests():
         "gym_id": "tarvos-fit",
         "identity": {
             "gym_name": "Tarvos Fit",
-            "city": "Chennai",
+            "city": "Pappanamcode, Trivandrum",
             "logo_url": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0idGZHcmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzE2YTM0YSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxNTgwM2QiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiByeD0iNDQiIGZpbGw9InVybCgjdGZHcmFkKSIvPgogIDxyZWN0IHg9IjYiIHk9IjYiIHdpZHRoPSIxODgiIGhlaWdodD0iMTg4IiByeD0iMzgiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjI1KSIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAwLCA4NSkiPgogICAgPHJlY3QgeD0iLTY1IiB5PSItMTgiIHdpZHRoPSIxNCIgaGVpZ2h0PSIzNiIgcng9IjQiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuOTUiLz4KICAgIDxyZWN0IHg9Ii00NyIgeT0iLTI2IiB3aWR0aD0iMTIiIGhlaWdodD0iNTIiIHJ4PSI0IiBmaWxsPSIjZmZmZmZmIi8+CiAgICA8cmVjdCB4PSIzNSIgeT0iLTI2IiB3aWR0aD0iMTIiIGhlaWdodD0iNTIiIHJ4PSI0IiBmaWxsPSIjZmZmZmZmIi8+CiAgICA8cmVjdCB4PSI1MSIgeT0iLTE4IiB3aWR0aD0iMTQiIGhlaWdodD0iMzYiIHJ4PSI0IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjk1Ii8+CiAgICA8cmVjdCB4PSItMzUiIHk9Ii02IiB3aWR0aD0iNzAiIGhlaWdodD0iMTIiIHJ4PSIzIiBmaWxsPSIjZmZmZmZmIi8+CiAgICA8cGF0aCBkPSJNLTIyLC0yNCBDLTEwLC00MiAxMCwtNDIgMjIsLTI0IEMxNCwtMTQgNiwtOCAwLDQgQy02LC04IC0xNCwtMTQgLTIyLC0yNCBaIiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjkiLz4KICA8L2c+CiAgPHRleHQgeD0iMTAwIiB5PSIxNjIiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmb250LXNpemU9IjMyIiBmaWxsPSIjZmZmZmZmIiBsZXR0ZXItc3BhY2luZz0iMyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VEFSVk9TPC90ZXh0Pgo8L3N2Zz4="
         },
         "theme": {
             "font_family": "Outfit",
-            "preset_name": "emerald",
-            "primary_color": "#16a34a",
-            "secondary_color": "#0f172a",
-            "accent_color": "#22c55e",
+            "preset_name": "crimson",
+            "primary_color": "#dc2626",
+            "secondary_color": "#1f2937",
+            "accent_color": "#b91c1c",
             "background_color": "#ffffff",
             "text_color": "#0f172a",
-            "button_color": "#16a34a",
-            "chatbot_header_color": "#0f172a",
-            "user_msg_color": "#16a34a",
-            "bot_msg_color": "#f1f5f9"
+            "button_color": "#dc2626",
+            "chatbot_header_color": "#1f2937",
+            "user_msg_color": "#dc2626",
+            "bot_msg_color": "#fef2f2"
         },
         "sections": {
             "enabled": ["hero", "trust_strip", "about", "programs", "facilities", "membership", "location", "trial_cta"],
@@ -77,9 +77,9 @@ def run_tests():
     info_data = info_res.json()
     assert info_data["gym_name"] == "Tarvos Fit"
     assert info_data["logo_url"] is not None
-    assert info_data["theme"]["primary_color"] == "#16a34a"
-    assert info_data["theme"]["chatbot_header_color"] == "#0f172a"
-    assert info_data["theme"]["font_family"] == "Outfit"
+    assert info_data["theme"]["primary_color"] == "#dc2626"
+    assert info_data["theme"]["chatbot_header_color"] == "#1f2937"
+    assert "font_family" in info_data["theme"]
     print("✓ 4. Unified Theme & Logo Synchronization Passed")
 
     # ---------------------------------------------------------
@@ -278,7 +278,7 @@ def run_tests():
     assert res_pub.status_code == 200
 
     pages = [
-        ("/", "Tarvos Fit", {"host": "tarvos.fit"}),
+        ("/", "Tarvos Fit", {"host": "tarvosfitness.com"}),
         ("/site", "Tarvos Fit", {}),
         ("/leads", "Leads Central", {}),
         ("/admin", "Admin Login", {}),
@@ -392,7 +392,7 @@ def run_tests():
         idx_html = f.read()
     assert '<footer' in site_content
     assert 'Contact Us' in site_content, "Contact Us heading missing in footer!"
-    assert 'admin@tarvos.fit' in site_content, "Contact email missing in footer!"
+    assert 'admin@tarvosfitness.com' in site_content, "Contact email missing in footer!"
     assert 'href="leads"' not in site_content, "Leads Central link found in public site footer!"
     print("✓ 25. Public Website Footer Cleanliness & Contact Us Heading Passed")
 

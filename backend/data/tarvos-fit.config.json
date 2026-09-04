@@ -13,7 +13,7 @@
       "en"
     ],
     "currency": "INR",
-    "city": "Chennai",
+    "city": "Pappanamcode, Trivandrum",
     "google_maps_url": null,
     "instagram_url": null,
     "instagram_transformation_url": null,
@@ -94,17 +94,17 @@
   "answers": [],
   "custom_qa": [],
   "theme": {
-    "primary_color": "#16a34a",
-    "secondary_color": "#0f172a",
-    "accent_color": "#22c55e",
+    "primary_color": "#dc2626",
+    "secondary_color": "#1f2937",
+    "accent_color": "#b91c1c",
     "background_color": "#ffffff",
     "text_color": "#0f172a",
-    "button_color": "#16a34a",
-    "chatbot_header_color": "#0f172a",
-    "user_msg_color": "#16a34a",
-    "bot_msg_color": "#f1f5f9",
+    "button_color": "#dc2626",
+    "chatbot_header_color": "#1f2937",
+    "user_msg_color": "#dc2626",
+    "bot_msg_color": "#fef2f2",
     "font_family": "Outfit",
-    "preset_name": "emerald"
+    "preset_name": "crimson"
   },
   "sections": {
     "enabled_sections": [

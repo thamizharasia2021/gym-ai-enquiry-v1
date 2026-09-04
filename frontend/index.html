@@ -364,6 +364,7 @@ function categories(){ return [...new Set(schema.map(q => q.category))]; }
 function configuredCount(){ return Object.values(answers).filter(a => a.situation_label).length; }
 function escapeHtml(s){ return String(s || "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function escapeAttr(s){ return escapeHtml(s); }
+function escapeJs(s){ return String(s || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n"); }
 
 // resolves one question's current answer into final text
 function resolveText(q){
@@ -1568,7 +1569,7 @@ function renderQACategory(catName){
                 <option value="">— choose —</option>
                 ${SESSION_OPTIONS.map(o => `<option value="${escapeAttr(o)}" ${item.detailValue===o?"selected":""}>${o}</option>`).join("")}
               </select>`
-            : `<input data-detail-for="${item.q.id}" placeholder="e.g. 3, or a brand/location note" value="${escapeAttr(item.detailValue)}"/>`;
+            : `<input data-detail-for="${item.q.id}" placeholder="${item.q.id==='FAC_001' ? 'Number of cars (e.g. 4)' : (item.q.id==='FAC_002' ? 'Number of two-wheelers (e.g. 20)' : 'e.g. 3, or a brand/location note')}" value="${escapeAttr(item.detailValue)}"/>`;
           return `<div class="eqp-detail-row"><span>${escapeHtml(shortLabel(item.q))}</span>${control}</div>`;
         }).join("")}
       </div>`;
@@ -2607,9 +2608,60 @@ async function generateWebsite(){
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<title>${escapeHtml(identity.gym_name)} — Fitness, Training & Gym in ${escapeHtml(identity.city || "Area")}</title>
-<meta name="description" content="Join ${escapeHtml(identity.gym_name)}. Premium fitness center with certified personal trainers, modern equipment, and flexible memberships in ${escapeHtml(identity.city || "")}."/>
+<title>${escapeHtml(identity.gym_name)} | Best Gym & Personal Training Center in ${escapeHtml(identity.city || "Pappanamcode, Trivandrum")}</title>
+<meta name="description" content="${escapeHtml(identity.gym_name)} is the premier gym and personal training center in ${escapeHtml(identity.city || "Pappanamcode, Trivandrum")}. Certified fitness coaches, air-conditioned workout floor, 38+ advanced equipment, and custom weight loss & muscle gain programs."/>
+<meta name="keywords" content="best gym in pappanamcode, gym in trivandrum, personal training trivandrum, fitness center pappanamcode, weight loss gym trivandrum, bodybuilding gym pappanamcode, unisex gym trivandrum, ${escapeHtml(identity.gym_name).toLowerCase()}, best gym near me pappanamcode, gym membership plans trivandrum, tarvosfitness.com"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover"/>
+<link rel="canonical" href="${escapeAttr(identity.website || "https://tarvosfitness.com")}"/>
+<meta name="geo.region" content="IN-KL"/>
+<meta name="geo.placename" content="${escapeAttr(identity.city || "Pappanamcode, Trivandrum")}"/>
+<meta name="geo.position" content="8.4721;76.9745"/>
+<meta name="ICBM" content="8.4721, 76.9745"/>
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="${escapeHtml(identity.gym_name)} | Best Gym & Personal Training in ${escapeHtml(identity.city || "Pappanamcode, Trivandrum")}"/>
+<meta property="og:description" content="Transform your fitness at ${escapeHtml(identity.gym_name)}. State-of-the-art strength & cardio equipment, certified 1-on-1 personal coaches, and flexible membership plans."/>
+<meta property="og:url" content="${escapeAttr(identity.website || "https://tarvosfitness.com")}"/>
+<meta property="og:site_name" content="${escapeHtml(identity.gym_name)}"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="${escapeHtml(identity.gym_name)} | Premier Gym in ${escapeHtml(identity.city || "Pappanamcode, Trivandrum")}"/>
+<meta name="twitter:description" content="Certified personal trainers, modern workout equipment, AC gym floor, and weight loss programs in ${escapeHtml(identity.city || "Pappanamcode, Trivandrum")}."/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HealthClub",
+  "name": "${escapeJs(identity.gym_name)}",
+  "image": "${escapeJs(identity.website || "https://tarvosfitness.com")}/static/logo.png",
+  "@id": "${escapeJs(identity.website || "https://tarvosfitness.com")}",
+  "url": "${escapeJs(identity.website || "https://tarvosfitness.com")}",
+  "telephone": "${escapeJs(identity.primary_phone || "+917012854261")}",
+  "priceRange": "₹99 - ₹9999",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "${escapeJs(identity.gym_name)}, Pappanamcode Junction",
+    "addressLocality": "Pappanamcode",
+    "addressRegion": "Trivandrum, Kerala",
+    "postalCode": "695018",
+    "addressCountry": "IN"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 8.4721,
+    "longitude": 76.9745
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      "opens": "05:00",
+      "closes": "22:00"
+    }
+  ],
+  "sameAs": [
+    "${escapeJs(identity.instagram_url || "https://instagram.com/tarvosfit")}",
+    "${escapeJs(identity.google_maps_url || "https://maps.app.goo.gl/p6y2t84SyxYGhxnBA")}"
+  ]
+}
+</script>
 ${logoSrc ? `<link rel="icon" href="${logoSrc}"/>` : ""}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2981,19 +3033,56 @@ ${assembledSectionsHtml}
   </div>
 </div>
 
-<footer id="contact">
-  <div style="max-width:900px;margin:0 auto 20px;">
-    <h3 style="color:#ffffff;font-size:18px;font-weight:800;letter-spacing:0.5px;margin-bottom:8px;text-transform:uppercase;">Contact Us</h3>
-    <p style="color:#94a3b8;font-size:13px;margin-bottom:14px;">Connect with our team for memberships, trial passes, and fitness consultations:</p>
-    <div class="footer-links">
-      ${identity.primary_phone ? `<a href="tel:${escapeAttr(identity.primary_phone)}">📞 ${escapeHtml(identity.primary_phone)}</a>` : ""}
-      ${identity.whatsapp_number ? `<a href="https://wa.me/${escapeAttr(identity.whatsapp_number.replace(/\\D/g,""))}" target="_blank">💬 WhatsApp</a>` : ""}
-      ${identity.email ? `<a href="mailto:${escapeAttr(identity.email)}">✉️ ${escapeHtml(identity.email)}</a>` : ""}
-      <a href="${escapeAttr(mapsHref)}" target="_blank">📍 Google Maps</a>
-      <a href="${escapeAttr(instaHref)}" target="_blank">📷 Instagram</a>
+<footer id="contact" style="background:#0f172a;color:#ffffff;padding:50px 20px 30px;border-top:2px solid rgba(255,255,255,0.1);">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:36px;">
+      <span style="background:rgba(34,197,94,0.15);color:#22c55e;font-size:12px;font-weight:800;letter-spacing:1.5px;padding:6px 14px;border-radius:20px;text-transform:uppercase;">Get In Touch</span>
+      <h2 style="color:#ffffff;font-size:32px;font-weight:900;margin:12px 0 8px;letter-spacing:-0.5px;">Contact Us — ${escapeHtml(identity.gym_name)}</h2>
+      <p style="color:#94a3b8;font-size:16px;max-width:600px;margin:0 auto;">Have questions about membership, trial passes, or personal training? Reach out to our front desk instantly via any channel below.</p>
     </div>
+
+    <div class="contact-card-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:18px;margin-bottom:40px;">
+      ${identity.whatsapp_number ? `
+      <a href="https://wa.me/${escapeAttr((identity.whatsapp_number.replace(/\\D/g,"").length===10?"91":"") + identity.whatsapp_number.replace(/\\D/g,""))}?text=${encodeURIComponent('Hi ' + identity.gym_name + ', I have an enquiry regarding gym membership.')}" target="_blank" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:linear-gradient(135deg, #16a34a 0%, #15803d 100%);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease, box-shadow 0.2s ease;box-shadow:0 8px 20px rgba(22,163,74,0.3);text-align:center;">
+        <span style="font-size:36px;margin-bottom:10px;">💬</span>
+        <strong style="font-size:18px;font-weight:800;margin-bottom:4px;">WhatsApp Us</strong>
+        <span style="font-size:13px;opacity:0.9;font-weight:600;">${escapeHtml(identity.whatsapp_number)}</span>
+        <span style="font-size:11px;margin-top:8px;background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:12px;font-weight:700;letter-spacing:0.5px;">⚡ INSTANT CHAT</span>
+      </a>` : ""}
+
+      ${identity.primary_phone ? `
+      <a href="tel:${escapeAttr(identity.primary_phone)}" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease, border-color 0.2s ease;text-align:center;">
+        <span style="font-size:36px;margin-bottom:10px;">📞</span>
+        <strong style="font-size:18px;font-weight:800;margin-bottom:4px;">Call Desk</strong>
+        <span style="font-size:13px;color:#cbd5e1;font-weight:600;">${escapeHtml(identity.primary_phone)}</span>
+        <span style="font-size:11px;margin-top:8px;background:rgba(255,255,255,0.1);padding:4px 10px;border-radius:12px;color:#94a3b8;font-weight:600;">CALL DIRECTLY</span>
+      </a>` : ""}
+
+      <a href="${escapeAttr(instaHref)}" target="_blank" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease;box-shadow:0 8px 20px rgba(253,29,29,0.25);text-align:center;">
+        <span style="font-size:36px;margin-bottom:10px;">📷</span>
+        <strong style="font-size:18px;font-weight:800;margin-bottom:4px;">Instagram</strong>
+        <span style="font-size:13px;opacity:0.9;font-weight:600;">@${escapeHtml(instaHandle)}</span>
+        <span style="font-size:11px;margin-top:8px;background:rgba(255,255,255,0.25);padding:4px 10px;border-radius:12px;font-weight:700;">FOLLOW & DM</span>
+      </a>
+
+      ${identity.email ? `
+      <a href="mailto:${escapeAttr(identity.email)}" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease;text-align:center;">
+        <span style="font-size:36px;margin-bottom:10px;">✉️</span>
+        <strong style="font-size:18px;font-weight:800;margin-bottom:4px;">Email Us</strong>
+        <span style="font-size:13px;color:#cbd5e1;font-weight:600;">${escapeHtml(identity.email)}</span>
+        <span style="font-size:11px;margin-top:8px;background:rgba(255,255,255,0.1);padding:4px 10px;border-radius:12px;color:#94a3b8;font-weight:600;">SEND EMAIL</span>
+      </a>` : ""}
+
+      <a href="${escapeAttr(mapsHref)}" target="_blank" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease;text-align:center;">
+        <span style="font-size:36px;margin-bottom:10px;">📍</span>
+        <strong style="font-size:18px;font-weight:800;margin-bottom:4px;">Google Maps</strong>
+        <span style="font-size:13px;color:#cbd5e1;font-weight:600;">Pappanamcode, Trivandrum</span>
+        <span style="font-size:11px;margin-top:8px;background:rgba(255,255,255,0.1);padding:4px 10px;border-radius:12px;color:#94a3b8;font-weight:600;">GET DIRECTIONS</span>
+      </a>
+    </div>
+
+    <p style="border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;text-align:center;color:#64748b;font-size:13px;">© ${new Date().getFullYear()} ${escapeHtml(identity.gym_name)}. All Rights Reserved. Built with Gym AI Assistant.</p>
   </div>
-  <p style="border-top:1px solid rgba(255,255,255,0.08);padding-top:16px;color:#64748b;">© ${new Date().getFullYear()} ${escapeHtml(identity.gym_name)}. All Rights Reserved. Built with Gym AI Assistant.</p>
 </footer>
 
 <script>

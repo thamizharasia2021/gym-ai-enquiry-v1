@@ -114,6 +114,37 @@ def get_system_config():
     }
 
 
+@app.get("/robots.txt", response_class=Response)
+def get_robots_txt():
+    content = f"User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /leads\nDisallow: /dashboard\nSitemap: https://{config.APP_DOMAIN}/sitemap.xml\n"
+    return Response(content=content, media_type="text/plain")
+
+@app.get("/sitemap.xml", response_class=Response)
+def get_sitemap_xml():
+    xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://{config.APP_DOMAIN}/</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://{config.APP_DOMAIN}/site</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://{config.APP_DOMAIN}/chat</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>"""
+    return Response(content=xml_content, media_type="application/xml")
+
+
 class AdminVerifyPayload(BaseModel):
     username: str = "admin"
     password: str = ""
