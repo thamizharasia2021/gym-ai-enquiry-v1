@@ -27,7 +27,7 @@
   nav button:hover{background:#f1f5f9;}
   nav button.active{background:#dcfce7;color:var(--accent-dark);font-weight:700;}
   nav button .ic{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
-  nav button .lbl{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  nav button .lbl{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;}
   nav .count{font-size:10.5px;color:var(--muted);flex-shrink:0;}
   nav button.active .count{color:var(--accent-dark);}
 
@@ -271,7 +271,27 @@ const API = typeof GymTheme !== "undefined" ? GymTheme.getApiBase() : (
 );
 
 let schema = [];
-let identity = { gym_name:"", brand_name:"", short_description:"", primary_phone:"", whatsapp_number:"", email:"", website:"", city:"", google_maps_url:"", instagram_url:"", instagram_transformation_url:"", instagram_events_url:"", instagram_about_url:"", member_count_range:"", gallery:[] };
+let identity = {
+  gym_name: "Tarvos Fit",
+  brand_name: "Tarvos Fit",
+  short_description: "Premier Fitness & Personal Training Center in Pappanamcode, Trivandrum",
+  primary_phone: "+91 70128 54261",
+  whatsapp_number: "+91 73565 51321",
+  email: "admin@tarvosfitness.com",
+  city: "Pappanamcode, Trivandrum",
+  full_address: "Pappanamcode, Trivandrum, Kerala 695018",
+  landmark: "Pappanamcode Junction",
+  opening_hours: "Mon-Sat: 5:30 AM - 10:00 PM",
+  sunday_hours: "6:00 AM - 1:00 PM",
+  google_maps_url: "https://maps.app.goo.gl/p6y2t84SyxYGhxnBA",
+  instagram_url: "https://instagram.com/tarvosfit",
+  instagram_transformation_url: "",
+  instagram_events_url: "",
+  instagram_about_url: "",
+  website: "https://tarvosfitness.com",
+  member_count_range: "100-500",
+  gallery: []
+};
 const MEMBER_COUNT_OPTIONS = ["<100", "100-500", ">500"];
 const MEMBER_COUNT_DISPLAY = { "<100":"100+", "100-500":"500+", ">500":"750+" };
 let answers = {}; // id -> { situation_label, field_values }
@@ -359,8 +379,20 @@ const contentEl = document.getElementById("content");
 const statusEl = document.getElementById("statusText");
 const gymIdInput = document.getElementById("gymIdInput");
 
+const FALLBACK_CATEGORIES = [
+  "Gym & Location", "Timings & Crowd", "Parking & Facilities",
+  "Membership & Offers", "Trial & Joining", "Reviews & Social",
+  "PT & Trainers", "Classes & Programs", "Equipment",
+  "Health, Injury & Diet", "Nutrition Products", "Policies / Hygiene"
+];
+
 function gymId(){ return gymIdInput.value.trim(); }
-function categories(){ return [...new Set(schema.map(q => q.category))]; }
+function categories(){
+  if(schema && schema.length){
+    return [...new Set(schema.map(q => q.category))];
+  }
+  return FALLBACK_CATEGORIES;
+}
 function configuredCount(){ return Object.values(answers).filter(a => a.situation_label).length; }
 function escapeHtml(s){ return String(s || "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function escapeAttr(s){ return escapeHtml(s); }
@@ -608,17 +640,21 @@ function restoreFromLocalStorage(){
 function renderIdentity(){
   const essentialFields = [
     { key: "gym_name", label: "Gym / Brand Name", placeholder: "e.g. Tarvos Fit", icon: "🏋️" },
-    { key: "short_description", label: "Tagline / Short Description", placeholder: "e.g. Premier Fitness & Personal Training Center", icon: "✨", isLong: true },
-    { key: "primary_phone", label: "Primary Phone Number", placeholder: "e.g. 9343435566", icon: "📞" },
-    { key: "whatsapp_number", label: "WhatsApp Support Number", placeholder: "e.g. 9344356565", icon: "💬" },
-    { key: "email", label: "Contact Email", placeholder: "e.g. contact@tarvos.fit", icon: "✉️" },
-    { key: "city", label: "City / Area", placeholder: "e.g. Trivandrum", icon: "🏙️" },
-    { key: "google_maps_url", label: "Google Maps Location Link", placeholder: "https://maps.app.goo.gl/...", icon: "📍" },
-    { key: "instagram_url", label: "Instagram Main Profile Link", placeholder: "https://www.instagram.com/tarvos.fit", icon: "📸" },
+    { key: "short_description", label: "Tagline / Short Description", placeholder: "e.g. Premier Fitness & Personal Training Center in Pappanamcode, Trivandrum", icon: "✨", isLong: true },
+    { key: "primary_phone", label: "Primary Phone Number", placeholder: "e.g. +91 70128 54261", icon: "📞" },
+    { key: "whatsapp_number", label: "WhatsApp Support Number", placeholder: "e.g. +91 73565 51321", icon: "💬" },
+    { key: "email", label: "Contact Email", placeholder: "e.g. admin@tarvosfitness.com", icon: "✉️" },
+    { key: "city", label: "City / Area", placeholder: "e.g. Pappanamcode, Trivandrum", icon: "🏙️" },
+    { key: "full_address", label: "Full Street Address", placeholder: "e.g. Pappanamcode, Trivandrum, Kerala 695018", icon: "🏢", isLong: true },
+    { key: "landmark", label: "Nearby Landmark", placeholder: "e.g. Pappanamcode Junction", icon: "📍" },
+    { key: "opening_hours", label: "Weekday Opening Hours", placeholder: "e.g. Mon-Sat: 5:30 AM - 10:00 PM", icon: "🕒" },
+    { key: "sunday_hours", label: "Sunday Hours", placeholder: "e.g. 6:00 AM - 1:00 PM", icon: "☀️" },
+    { key: "google_maps_url", label: "Google Maps Location Link", placeholder: "https://maps.app.goo.gl/p6y2t84SyxYGhxnBA", icon: "🗺️" },
+    { key: "instagram_url", label: "Instagram Main Profile Link", placeholder: "https://instagram.com/tarvosfit", icon: "📸" },
     { key: "instagram_transformation_url", label: "🔥 Transformations Post/Reel Link (oEmbed)", placeholder: "https://www.instagram.com/reel/C-xyz123/", icon: "🔥" },
     { key: "instagram_events_url", label: "🎉 Events & Challenges Post/Reel Link (oEmbed)", placeholder: "https://www.instagram.com/p/C-abc456/", icon: "🎉" },
     { key: "instagram_about_url", label: "ℹ️ About & Gym Tour Post/Reel Link (oEmbed)", placeholder: "https://www.instagram.com/reel/C-tour789/", icon: "ℹ️" },
-    { key: "website", label: "Website Domain URL", placeholder: "https://tarvos.fit", icon: "🌐" },
+    { key: "website", label: "Website Domain URL", placeholder: "https://tarvosfitness.com", icon: "🌐" },
   ];
 
     const currentLogo = identity.logo_url || theme.logoDataUrl;
@@ -1790,14 +1826,21 @@ async function loadSavedConfig(){
 }
 
 async function loadSchema(){
+  renderAll();
   try{
     const res = await fetch(API + "/api/schema");
-    schema = await res.json();
-    if(schema.length) activeCat = "__identity__";
-    await loadSavedConfig();
+    if(res.ok){
+      const data = await res.json();
+      if(Array.isArray(data) && data.length){
+        schema = data;
+      }
+    }
   }catch(e){
-    setStatus(describeFetchError(e));
+    console.log("loadSchema fallback:", e);
   }
+  if(!activeCat) activeCat = "__identity__";
+  await loadSavedConfig();
+  renderAll();
 }
 
 async function saveConfig(){
