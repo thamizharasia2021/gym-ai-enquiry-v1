@@ -260,6 +260,8 @@
   <iframe id="chatPreviewFrame" src="about:blank" style="width:100%;height:100%;border:none;flex:1;"></iframe>
 </div>
 
+<script src="/static/qa_schema.js"></script>
+<script src="qa_schema.js"></script>
 <script src="/static/theme-sync.js"></script>
 <script>
 const API = typeof GymTheme !== "undefined" ? GymTheme.getApiBase() : (
@@ -270,7 +272,7 @@ const API = typeof GymTheme !== "undefined" ? GymTheme.getApiBase() : (
   )
 );
 
-let schema = [];
+let schema = (typeof window !== "undefined" && Array.isArray(window.DEFAULT_QA_SCHEMA)) ? window.DEFAULT_QA_SCHEMA : [];
 let identity = {
   gym_name: "Tarvos Fit",
   brand_name: "Tarvos Fit",
@@ -1768,28 +1770,31 @@ async function checkBackendStatus(){
   const el = document.getElementById("backendStatusRow");
   try{
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 5000);
+    const timer = setTimeout(() => controller.abort(), 2000);
     const res = await fetch(API + "/health", { signal: controller.signal });
     clearTimeout(timer);
     if(res.ok){
-      el.textContent = "🟢 Backend connected";
+      el.innerHTML = '<span style="color:#4ade80;font-weight:700;">🟢 Backend connected</span>';
       el.title = API;
     }else{
-      el.textContent = "🟠 Backend responded with an error (" + res.status + ")";
+      el.innerHTML = '<span style="color:#f97316;font-weight:700;">🟠 Backend response error (' + res.status + ')</span>';
       el.title = API;
     }
   }catch(e){
-    el.textContent = "🔴 Backend unreachable at " + API;
-    el.title = "Start the FastAPI server, or set window.GYM_AI_API_BASE to the right URL before this page loads.";
+    el.innerHTML = '<span style="color:#64748b;font-weight:600;">⚡ Local / Standalone Mode</span>';
+    el.title = "Backend server not reached at " + API + ". Setup wizard is fully functional in standalone mode.";
   }
 }
 checkBackendStatus();
-setInterval(checkBackendStatus, 20000);
+setInterval(checkBackendStatus, 15000);
 
 // ------------------------------------------------------------------- api --
 async function loadSavedConfig(){
   try{
-    const res = await fetch(`${API}/api/gym/${gymId()}/config`);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 2000);
+    const res = await fetch(`${API}/api/gym/${gymId()}/config`, { signal: controller.signal });
+    clearTimeout(timer);
     if(res.ok){
       const data = await res.json();
       if(data.identity && Object.keys(data.identity).length){
@@ -1819,7 +1824,6 @@ async function loadSavedConfig(){
   }catch(e){
     console.log("loadSavedConfig fallback:", e);
   }
-  // Also restore any draft changes from localStorage
   restoreFromLocalStorage();
   syncAnswersToPlans();
   renderAll();
@@ -1828,7 +1832,10 @@ async function loadSavedConfig(){
 async function loadSchema(){
   renderAll();
   try{
-    const res = await fetch(API + "/api/schema");
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 2000);
+    const res = await fetch(API + "/api/schema", { signal: controller.signal });
+    clearTimeout(timer);
     if(res.ok){
       const data = await res.json();
       if(Array.isArray(data) && data.length){
@@ -3323,6 +3330,8 @@ function toggleWebChat(){
 if(chatFab) chatFab.addEventListener("click", toggleWebChat);
 if(chatCloseBtn) chatCloseBtn.addEventListener("click", toggleWebChat);
 
+restoreFromLocalStorage();
+renderAll();
 loadSchema();
 </script>
 </body>
