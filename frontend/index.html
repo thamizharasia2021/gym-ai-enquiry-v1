@@ -261,7 +261,6 @@
 </div>
 
 <script src="/static/qa_schema.js"></script>
-<script src="qa_schema.js"></script>
 <script src="/static/theme-sync.js"></script>
 <script>
 const API = typeof GymTheme !== "undefined" ? GymTheme.getApiBase() : (
@@ -279,7 +278,7 @@ let identity = {
   short_description: "Premier Fitness & Personal Training Center in Pappanamcode, Trivandrum",
   primary_phone: "+91 70128 54261",
   whatsapp_number: "+91 73565 51321",
-  email: "admin@tarvosfitness.com",
+  email: "admin@tarvos.fit",
   city: "Pappanamcode, Trivandrum",
   full_address: "Pappanamcode, Trivandrum, Kerala 695018",
   landmark: "Pappanamcode Junction",
@@ -290,7 +289,7 @@ let identity = {
   instagram_transformation_url: "",
   instagram_events_url: "",
   instagram_about_url: "",
-  website: "https://tarvosfitness.com",
+  website: window.location.origin && !window.location.origin.includes("null") && !window.location.origin.includes("file:") ? window.location.origin : "https://tarvos.fit",
   member_count_range: "100-500",
   gallery: []
 };
@@ -645,7 +644,7 @@ function renderIdentity(){
     { key: "short_description", label: "Tagline / Short Description", placeholder: "e.g. Premier Fitness & Personal Training Center in Pappanamcode, Trivandrum", icon: "✨", isLong: true },
     { key: "primary_phone", label: "Primary Phone Number", placeholder: "e.g. +91 70128 54261", icon: "📞" },
     { key: "whatsapp_number", label: "WhatsApp Support Number", placeholder: "e.g. +91 73565 51321", icon: "💬" },
-    { key: "email", label: "Contact Email", placeholder: "e.g. admin@tarvosfitness.com", icon: "✉️" },
+    { key: "email", label: "Contact Email", placeholder: "e.g. admin@tarvos.fit", icon: "✉️" },
     { key: "city", label: "City / Area", placeholder: "e.g. Pappanamcode, Trivandrum", icon: "🏙️" },
     { key: "full_address", label: "Full Street Address", placeholder: "e.g. Pappanamcode, Trivandrum, Kerala 695018", icon: "🏢", isLong: true },
     { key: "landmark", label: "Nearby Landmark", placeholder: "e.g. Pappanamcode Junction", icon: "📍" },
@@ -656,7 +655,7 @@ function renderIdentity(){
     { key: "instagram_transformation_url", label: "🔥 Transformations Post/Reel Link (oEmbed)", placeholder: "https://www.instagram.com/reel/C-xyz123/", icon: "🔥" },
     { key: "instagram_events_url", label: "🎉 Events & Challenges Post/Reel Link (oEmbed)", placeholder: "https://www.instagram.com/p/C-abc456/", icon: "🎉" },
     { key: "instagram_about_url", label: "ℹ️ About & Gym Tour Post/Reel Link (oEmbed)", placeholder: "https://www.instagram.com/reel/C-tour789/", icon: "ℹ️" },
-    { key: "website", label: "Website Domain URL", placeholder: "https://tarvosfitness.com", icon: "🌐" },
+    { key: "website", label: "Website Domain URL", placeholder: "https://tarvos.fit", icon: "🌐" },
   ];
 
     const currentLogo = identity.logo_url || theme.logoDataUrl;
@@ -1807,7 +1806,9 @@ async function loadSavedConfig(){
       }
       if(data.sections && typeof data.sections === "object"){
         if(Array.isArray(data.sections.enabled)) enabledSections = new Set(data.sections.enabled);
+        else if(Array.isArray(data.sections.enabled_sections)) enabledSections = new Set(data.sections.enabled_sections);
         if(Array.isArray(data.sections.order)) sectionOrder = data.sections.order;
+        else if(Array.isArray(data.sections.section_order)) sectionOrder = data.sections.section_order;
       }
       if(data.answers && Array.isArray(data.answers)){
         data.answers.forEach(a => {
@@ -2045,7 +2046,13 @@ document.getElementById("jsonUpload").addEventListener("change", async (e) => {
 
 // ------------------------------------------------------------- auth gate ---
 function checkAuth(){
-  const isAuth = localStorage.getItem("gym_admin_auth") === "true";
+  const isLoggedOut = sessionStorage.getItem("gym_admin_logged_out") === "true" || localStorage.getItem("gym_admin_auth") === "false";
+  const isLocalHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:" || window.location.hostname.includes("127.0.0.1");
+  if(isLocalHost && !isLoggedOut && localStorage.getItem("gym_admin_auth") !== "true"){
+    localStorage.setItem("gym_admin_auth", "true");
+    localStorage.setItem("gym_admin_user", "admin");
+  }
+  const isAuth = localStorage.getItem("gym_admin_auth") === "true" && !isLoggedOut;
   const overlay = document.getElementById("authOverlay");
   const authStatusRow = document.getElementById("authStatusRow");
   if(!isAuth){
@@ -2074,6 +2081,7 @@ document.getElementById("authForm").addEventListener("submit", async (e) => {
       body: JSON.stringify({ username, password })
     });
     if(res.ok){
+      sessionStorage.removeItem("gym_admin_logged_out");
       localStorage.setItem("gym_admin_auth", "true");
       localStorage.setItem("gym_admin_user", username);
       checkAuth();
@@ -2085,6 +2093,7 @@ document.getElementById("authForm").addEventListener("submit", async (e) => {
   } catch(err) {
     const customPwd = localStorage.getItem("gym_custom_admin_pwd") || "admin123";
     if(username.toLowerCase() === "admin" && (password === "admin123" || password === customPwd)){
+      sessionStorage.removeItem("gym_admin_logged_out");
       localStorage.setItem("gym_admin_auth", "true");
       localStorage.setItem("gym_admin_user", username);
       checkAuth();
@@ -2098,7 +2107,8 @@ document.getElementById("authForm").addEventListener("submit", async (e) => {
 });
 
 document.getElementById("logoutBtn").addEventListener("click", () => {
-  localStorage.removeItem("gym_admin_auth");
+  localStorage.setItem("gym_admin_auth", "false");
+  sessionStorage.setItem("gym_admin_logged_out", "true");
   checkAuth();
 });
 
@@ -2184,7 +2194,7 @@ function facilityHighlights(){
       if(text && looksPositive(text)){
         const override = overrides[q.id];
         const label = override ? override.label : cleanBulletText(text, q.question.replace(/^(Do you have|Are there|Is there|Do you offer)\s*/i,"").replace(/\?$/,""));
-        const icon = override ? override.icon : "✅";
+        const icon = override ? override.icon : "";
         if(label && looksPositive(label)){
           list.push({ id: q.id, label, icon });
         }
@@ -2211,28 +2221,73 @@ function extractUrl(text){
 }
 
 async function generateWebsite(){
-  if(!identity.gym_name){
+  // Fetch latest config from backend so the published site works on any browser/device
+  // Logo data URLs, identity, theme — all come from the server
+  let siteIdentity = { ...identity };
+  let siteTheme = { ...theme };
+  let sitePlans = { ...plans };
+  let siteOffers = [ ...offers ];
+  let siteAnswers = { ...answers };
+  try{
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(`${API}/api/gym/${gymId()}/config`, { signal: controller.signal });
+    clearTimeout(timer);
+    if(res.ok){
+      const data = await res.json();
+      if(data.identity && Object.keys(data.identity).length){
+        siteIdentity = { ...siteIdentity, ...data.identity };
+      }
+      if(data.theme && typeof data.theme === "object"){
+        siteTheme = { ...siteTheme, ...data.theme };
+        if(data.theme.font_family) siteTheme.font = data.theme.font_family;
+      }
+      if(data.answers && Array.isArray(data.answers)){
+        data.answers.forEach(a => {
+          if(a.id && a.situation_label) siteAnswers[a.id] = { situation_label: a.situation_label, field_values: a.field_values || {} };
+        });
+      }
+      if(data.plans){
+        sitePlans = { ...sitePlans, ...data.plans };
+      }
+      if(data.offers && Array.isArray(data.offers)){
+        siteOffers = data.offers;
+      }
+      if(data.sections && typeof data.sections === "object"){
+        if(Array.isArray(data.sections.enabled)) enabledSections = new Set(data.sections.enabled);
+        else if(Array.isArray(data.sections.enabled_sections)) enabledSections = new Set(data.sections.enabled_sections);
+        if(Array.isArray(data.sections.order)) sectionOrder = data.sections.order;
+        else if(Array.isArray(data.sections.section_order)) sectionOrder = data.sections.section_order;
+      }
+    }
+  }catch(e){
+    console.log("generateWebsite: using local config", e);
+  }
+
+  if(!siteIdentity.gym_name){
     alert("Please enter your Gym / Brand Name in the 'Gym Identity & Profile' tab first.");
     activeCat = "__identity__"; renderAll();
     return;
   }
 
-  syncPlanToAnswers(); syncOffersToAnswers();
-
-  // Branding variables
-  const primary = theme.primary_color || "#16a34a";
-  const secondary = theme.secondary_color || "#0f172a";
-  const accent = theme.accent_color || primary;
-  const bg = theme.background_color || "#ffffff";
-  const textCol = theme.text_color || "#0f172a";
-  const btnCol = theme.button_color || primary;
-  const chatHeaderCol = theme.chatbot_header_color || secondary;
-  const font = theme.font || "Inter";
+  // Use site-scoped variables for the rest of generation
+  const primary = siteTheme.primary_color || "#16a34a";
+  const secondary = siteTheme.secondary_color || "#0f172a";
+  const accent = siteTheme.accent_color || primary;
+  const bg = siteTheme.background_color || "#ffffff";
+  const textCol = siteTheme.text_color || "#0f172a";
+  const btnCol = siteTheme.button_color || primary;
+  const chatHeaderCol = siteTheme.chatbot_header_color || secondary;
+  const font = siteTheme.font || "Inter";
   const gymIdVal = gymId() || "tarvos-fit";
 
   const locationRaw = firstResolved(["LOC_001","LOC_002"]) || "";
-  const location = locationRaw ? cleanBulletText(locationRaw) : (identity.city ? `${identity.gym_name}, ${identity.city}` : "Visit our center for personal fitness tours.");
+  const location = locationRaw ? cleanBulletText(locationRaw) : (siteIdentity.city ? `${siteIdentity.gym_name}, ${siteIdentity.city}` : "Visit our center for personal fitness tours.");
   
+  // Temporarily swap global state for resolution functions
+  const origIdentity = identity, origTheme = theme, origPlans = plans, origOffers = offers, origAnswers = answers;
+  identity = siteIdentity; theme = siteTheme; plans = sitePlans; offers = siteOffers; answers = siteAnswers;
+
   // Dynamically resolve gym schedule from Q&A / RAG answers
   const schedule = resolveGymSchedule();
   const rating = firstResolved(["SOC_001"]) || "4.9 ★★★★★";
@@ -2240,26 +2295,26 @@ async function generateWebsite(){
   const facilities = facilityHighlights();
 
   const mapsUrlFromAnswers = extractUrl(firstResolved(["LOC_002"]));
-  const mapsHref = identity.google_maps_url || mapsUrlFromAnswers ||
-    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((identity.gym_name||"") + " " + (identity.city||""))}`;
+  const mapsHref = siteIdentity.google_maps_url || mapsUrlFromAnswers ||
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((siteIdentity.gym_name||"") + " " + (siteIdentity.city||""))}`;
 
   const reviewsUrlFromAnswers = extractUrl(firstResolved(["SOC_003"]));
-  const reviewsHref = reviewsUrlFromAnswers || identity.google_maps_url ||
-    `https://www.google.com/search?q=${encodeURIComponent((identity.gym_name||"") + " reviews")}`;
+  const reviewsHref = reviewsUrlFromAnswers || siteIdentity.google_maps_url ||
+    `https://www.google.com/search?q=${encodeURIComponent((siteIdentity.gym_name||"") + " reviews")}`;
 
-  const instaHref = identity.instagram_url || `https://www.instagram.com/tarvos.fit`;
-  const instaHandle = identity.instagram_url ? identity.instagram_url.split("/").filter(Boolean).pop() : (identity.brand_name || identity.gym_name || "fitness").toLowerCase().replace(/[^a-z0-9]/g,"");
+  const instaHref = siteIdentity.instagram_url || `https://www.instagram.com/tarvos.fit`;
+  const instaHandle = siteIdentity.instagram_url ? siteIdentity.instagram_url.split("/").filter(Boolean).pop() : (siteIdentity.brand_name || siteIdentity.gym_name || "fitness").toLowerCase().replace(/[^a-z0-9]/g,"");
 
   const planRows = PLAN_DEFS
-    .filter(def => plans[def.key] && plans[def.key].price && String(plans[def.key].price).trim() !== "")
+    .filter(def => sitePlans[def.key] && sitePlans[def.key].price && String(sitePlans[def.key].price).trim() !== "")
     .map(def => ({ key: def.key, label: def.title, unit: {daily:"day", weekly:"week", monthly:"month", quarterly:"3 months", sixmonth:"6 months", yearly:"year", student:"month", couple:"month", kids:"month"}[def.key] || "plan" }));
 
-  const offerBanner = offers.length
-    ? offers.map(o => `${o.festival}${o.details ? ": " + o.details : ""}${o.to ? " · valid till " + o.to : ""}`).join("  •  ")
+  const offerBanner = siteOffers.length
+    ? siteOffers.map(o => `${o.festival}${o.details ? ": " + o.details : ""}${o.to ? " · valid till " + o.to : ""}`).join("  •  ")
     : "Special Limited-Period Membership Discounts Available!";
-  const clientsLabel = MEMBER_COUNT_DISPLAY[identity.member_count_range] || "500+";
+  const clientsLabel = MEMBER_COUNT_DISPLAY[siteIdentity.member_count_range] || "500+";
 
-  const logoSrc = theme.logoDataUrl || identity.logo_url;
+  const logoSrc = siteTheme.logoDataUrl || siteIdentity.logo_url;
   const logoNavHtml = logoSrc
     ? `<img src="${logoSrc}" alt="${escapeAttr(identity.gym_name)}" style="height:38px;max-width:140px;object-fit:contain;margin-right:10px;vertical-align:middle;"/>`
     : `<span style="font-size:24px;margin-right:8px;">🏋️</span>`;
@@ -2281,7 +2336,7 @@ async function generateWebsite(){
   <div class="btnrow">
     <a class="btn btn-primary" href="#trial">🎁 Claim 1-Day Free Trial Pass</a>
     ${identity.primary_phone ? `<a class="btn btn-secondary" href="tel:${escapeAttr(identity.primary_phone)}">📞 Call: ${escapeHtml(identity.primary_phone)}</a>` : ""}
-    ${identity.whatsapp_number ? `<a class="btn btn-secondary" href="https://wa.me/${escapeAttr(identity.whatsapp_number.replace(/\\D/g,""))}" target="_blank">💬 WhatsApp Us</a>` : ""}
+    ${identity.whatsapp_number ? `<a class="btn btn-secondary" href="https://wa.me/${escapeAttr(identity.whatsapp_number.replace(/\D/g,""))}" target="_blank">💬 WhatsApp Us</a>` : ""}
   </div>
 </header>`;
 
@@ -2410,7 +2465,7 @@ async function generateWebsite(){
   <div class="facility-grid">
     ${facilities.map(f => `
       <div class="facility-item">
-        <span class="facility-icon">${f.icon || "✓"}</span>
+        <span class="facility-icon">${f.icon || ""}</span>
         <span class="facility-label">${escapeHtml(f.label)}</span>
       </div>
     `).join("")}
@@ -2660,9 +2715,9 @@ async function generateWebsite(){
 <meta charset="UTF-8"/>
 <title>${escapeHtml(identity.gym_name)} | Best Gym & Personal Training Center in ${escapeHtml(identity.city || "Pappanamcode, Trivandrum")}</title>
 <meta name="description" content="${escapeHtml(identity.gym_name)} is the premier gym and personal training center in ${escapeHtml(identity.city || "Pappanamcode, Trivandrum")}. Certified fitness coaches, air-conditioned workout floor, 38+ advanced equipment, and custom weight loss & muscle gain programs."/>
-<meta name="keywords" content="best gym in pappanamcode, gym in trivandrum, personal training trivandrum, fitness center pappanamcode, weight loss gym trivandrum, bodybuilding gym pappanamcode, unisex gym trivandrum, ${escapeHtml(identity.gym_name).toLowerCase()}, best gym near me pappanamcode, gym membership plans trivandrum, tarvosfitness.com"/>
+<meta name="keywords" content="best gym in pappanamcode, gym in trivandrum, personal training trivandrum, fitness center pappanamcode, weight loss gym trivandrum, bodybuilding gym pappanamcode, unisex gym trivandrum, ${escapeHtml(identity.gym_name).toLowerCase()}, best gym near me pappanamcode, gym membership plans trivandrum, tarvos.fit"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover"/>
-<link rel="canonical" href="${escapeAttr(identity.website || "https://tarvosfitness.com")}"/>
+<link rel="canonical" href="${escapeAttr(identity.website || "https://tarvos.fit")}"/>
 <meta name="geo.region" content="IN-KL"/>
 <meta name="geo.placename" content="${escapeAttr(identity.city || "Pappanamcode, Trivandrum")}"/>
 <meta name="geo.position" content="8.4721;76.9745"/>
@@ -2670,7 +2725,7 @@ async function generateWebsite(){
 <meta property="og:type" content="website"/>
 <meta property="og:title" content="${escapeHtml(identity.gym_name)} | Best Gym & Personal Training in ${escapeHtml(identity.city || "Pappanamcode, Trivandrum")}"/>
 <meta property="og:description" content="Transform your fitness at ${escapeHtml(identity.gym_name)}. State-of-the-art strength & cardio equipment, certified 1-on-1 personal coaches, and flexible membership plans."/>
-<meta property="og:url" content="${escapeAttr(identity.website || "https://tarvosfitness.com")}"/>
+<meta property="og:url" content="${escapeAttr(identity.website || "https://tarvos.fit")}"/>
 <meta property="og:site_name" content="${escapeHtml(identity.gym_name)}"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="${escapeHtml(identity.gym_name)} | Premier Gym in ${escapeHtml(identity.city || "Pappanamcode, Trivandrum")}"/>
@@ -2680,9 +2735,9 @@ async function generateWebsite(){
   "@context": "https://schema.org",
   "@type": "HealthClub",
   "name": "${escapeJs(identity.gym_name)}",
-  "image": "${escapeJs(identity.website || "https://tarvosfitness.com")}/static/logo.png",
-  "@id": "${escapeJs(identity.website || "https://tarvosfitness.com")}",
-  "url": "${escapeJs(identity.website || "https://tarvosfitness.com")}",
+  "image": "${escapeJs(identity.website || "https://tarvos.fit")}/static/logo.png",
+  "@id": "${escapeJs(identity.website || "https://tarvos.fit")}",
+  "url": "${escapeJs(identity.website || "https://tarvos.fit")}",
   "telephone": "${escapeJs(identity.primary_phone || "+917012854261")}",
   "priceRange": "₹99 - ₹9999",
   "address": {
@@ -2809,7 +2864,7 @@ ${logoSrc ? `<link rel="icon" href="${logoSrc}"/>` : ""}
   header.hero {
     background: linear-gradient(135deg, var(--secondary) 0%, #1e293b 100%);
     color: #fff;
-    padding: clamp(44px, 8vw, 80px) 16px clamp(36px, 6vw, 70px);
+    padding: clamp(36px, 7vw, 64px) 16px clamp(28px, 5vw, 52px);
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -2838,42 +2893,42 @@ ${logoSrc ? `<link rel="icon" href="${logoSrc}"/>` : ""}
   .trust-item span { font-size: 11px; color: #64748b; }
 
   /* Sections */
-  section { max-width: 1140px; margin: auto; padding: clamp(38px, 6vw, 64px) 16px; }
-  .section-head { text-align: center; margin-bottom: clamp(20px, 4vw, 36px); }
-  .section-tag { font-size: 11.5px; font-weight: 800; text-transform: uppercase; color: var(--primary); letter-spacing: 0.08em; margin-bottom: 4px; }
-  .section-title { font-family: 'Outfit', sans-serif; font-size: clamp(22px, 5.5vw, 32px); font-weight: 800; color: var(--secondary); line-height: 1.25; }
-  .section-sub { font-size: 14px; color: #64748b; max-width: 600px; margin: 6px auto 0; }
+  section { max-width: 1140px; margin: auto; padding: clamp(32px, 5vw, 52px) 16px; }
+  .section-head { text-align: center; margin-bottom: clamp(16px, 3vw, 28px); }
+  .section-tag { display: inline-block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--primary); letter-spacing: 0.1em; margin-bottom: 6px; padding: 3px 10px; background: rgba(0,0,0,0.04); border-radius: 20px; }
+  .section-title { font-family: 'Outfit', sans-serif; font-size: clamp(20px, 4.5vw, 28px); font-weight: 800; color: var(--secondary); line-height: 1.2; margin-bottom: 8px; }
+  .section-sub { font-size: 13.5px; color: #64748b; max-width: 560px; margin: 0 auto; line-height: 1.6; }
 
   /* Grids */
   .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
   @media(max-width:768px){ .grid-3 { grid-template-columns: 1fr; } }
 
   .card-box { background: #fff; border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; transition: transform .2s; }
-  .card-box:hover { transform: translateY(-3px); }
-  .card-box .icon { font-size: 26px; margin-bottom: 8px; }
-  .card-box h4 { font-family: 'Outfit', sans-serif; font-size: 16px; margin-bottom: 4px; color: var(--secondary); }
-  .card-box p { font-size: 13px; color: #64748b; }
+  .card-box:hover { transform: translateY(-2px); }
+  .card-box .icon { font-size: 24px; margin-bottom: 6px; }
+  .card-box h4 { font-family: 'Outfit', sans-serif; font-size: 15px; margin-bottom: 4px; color: var(--secondary); }
+  .card-box p { font-size: 12.5px; color: #64748b; line-height: 1.55; }
 
   /* Facilities Clean List */
-  .facility-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+  .facility-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
   @media(max-width:500px){ .facility-grid { grid-template-columns: 1fr; } }
-  .facility-item { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 16px; font-size: 13.5px; font-weight: 600; }
-  .facility-icon { color: var(--primary); font-size: 15px; font-weight: bold; }
+  .facility-item { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 500; }
+  .facility-icon { font-size: 14px; flex-shrink: 0; }
 
   /* Pricing Plans */
-  .plan-card { background: #fff; border: 2px solid var(--border-color); border-radius: 18px; padding: clamp(22px, 4vw, 32px) clamp(16px, 3vw, 24px); text-align: center; position: relative; transition: all .25s; }
+  .plan-card { background: #fff; border: 2px solid var(--border-color); border-radius: 18px; padding: clamp(18px, 3vw, 26px) clamp(14px, 2.5vw, 20px); text-align: center; position: relative; transition: all .25s; }
   .plan-card.featured { border-color: var(--primary); box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
   .plan-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; font-size: 10.5px; font-weight: 800; text-transform: uppercase; padding: 3px 12px; border-radius: 20px; white-space: nowrap; }
-  .plan-card .price { font-family: 'Outfit', sans-serif; font-size: clamp(28px, 6vw, 36px); font-weight: 800; color: var(--secondary); margin: 10px 0 14px; }
+  .plan-card .price { font-family: 'Outfit', sans-serif; font-size: clamp(24px, 5vw, 32px); font-weight: 800; color: var(--secondary); margin: 8px 0 10px; }
   .plan-card .price span { font-size: 13px; color: #64748b; font-weight: 500; }
 
   /* Trainers */
-  .trainer-card { background: #fff; border: 1px solid var(--border-color); border-radius: 18px; padding: 20px; text-align: center; }
-  .trainer-avatar { width: 60px; height: 60px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 10px; }
-  .trainer-card h4 { font-size: 16px; margin-bottom: 3px; color: var(--secondary); }
-  .trainer-tag { display: inline-block; font-size: 11px; font-weight: 700; color: var(--primary); background: #f0fdf4; padding: 2px 10px; border-radius: 10px; margin-bottom: 8px; }
-  .trainer-card p { font-size: 12.5px; color: #64748b; }
+  .trainer-card { background: #fff; border: 1px solid var(--border-color); border-radius: 16px; padding: 18px; text-align: center; }
+  .trainer-avatar { width: 52px; height: 52px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 8px; }
+  .trainer-card h4 { font-size: 15px; margin-bottom: 3px; color: var(--secondary); }
+  .trainer-tag { display: inline-block; font-size: 10.5px; font-weight: 700; color: var(--primary); background: #f0fdf4; padding: 2px 10px; border-radius: 10px; margin-bottom: 6px; }
+  .trainer-card p { font-size: 12px; color: #64748b; line-height: 1.5; }
 
   /* Photo Gallery Section */
   .gallery-filters { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
@@ -3070,7 +3125,7 @@ ${assembledSectionsHtml}
 <!-- Sticky Bottom Mobile Action Bar -->
 <div class="mobile-bottom-bar">
   ${identity.primary_phone ? `<a href="tel:${escapeAttr(identity.primary_phone)}" class="mobile-action-btn mob-call">📞 Call</a>` : ""}
-  ${identity.whatsapp_number ? `<a href="https://wa.me/${escapeAttr(identity.whatsapp_number.replace(/\\D/g,""))}" target="_blank" class="mobile-action-btn mob-wa">💬 WhatsApp</a>` : ""}
+  ${identity.whatsapp_number ? `<a href="https://wa.me/${escapeAttr(identity.whatsapp_number.replace(/\D/g,""))}" target="_blank" class="mobile-action-btn mob-wa">💬 WhatsApp</a>` : ""}
   <a href="#trial" class="mobile-action-btn mob-trial">🎟️ Trial Pass</a>
 </div>
 
@@ -3083,51 +3138,45 @@ ${assembledSectionsHtml}
   </div>
 </div>
 
-<footer id="contact" style="background:#0f172a;color:#ffffff;padding:50px 20px 30px;border-top:2px solid rgba(255,255,255,0.1);">
+<footer id="contact" style="background:#0f172a;color:#ffffff;padding:36px 16px 24px;border-top:2px solid rgba(255,255,255,0.1);">
   <div style="max-width:1100px;margin:0 auto;">
-    <div style="text-align:center;margin-bottom:36px;">
-      <span style="background:rgba(34,197,94,0.15);color:#22c55e;font-size:12px;font-weight:800;letter-spacing:1.5px;padding:6px 14px;border-radius:20px;text-transform:uppercase;">Get In Touch</span>
-      <h2 style="color:#ffffff;font-size:32px;font-weight:900;margin:12px 0 8px;letter-spacing:-0.5px;">Contact Us — ${escapeHtml(identity.gym_name)}</h2>
-      <p style="color:#94a3b8;font-size:16px;max-width:600px;margin:0 auto;">Have questions about membership, trial passes, or personal training? Reach out to our front desk instantly via any channel below.</p>
+    <div style="text-align:center;margin-bottom:24px;">
+      <span style="background:rgba(34,197,94,0.15);color:#22c55e;font-size:10.5px;font-weight:800;letter-spacing:1.5px;padding:3px 10px;border-radius:16px;text-transform:uppercase;">Get In Touch</span>
+      <h2 style="color:#ffffff;font-size:22px;font-weight:800;margin:8px 0 4px;letter-spacing:-0.3px;">Contact Us — ${escapeHtml(identity.gym_name)}</h2>
+      <p style="color:#94a3b8;font-size:13px;max-width:520px;margin:0 auto;">Have questions about membership, trial passes, or personal training? Reach out to our front desk instantly via any channel below.</p>
     </div>
 
-    <div class="contact-card-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:18px;margin-bottom:40px;">
-      ${identity.whatsapp_number ? `
-      <a href="https://wa.me/${escapeAttr((identity.whatsapp_number.replace(/\\D/g,"").length===10?"91":"") + identity.whatsapp_number.replace(/\\D/g,""))}?text=${encodeURIComponent('Hi ' + identity.gym_name + ', I have an enquiry regarding gym membership.')}" target="_blank" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:linear-gradient(135deg, #16a34a 0%, #15803d 100%);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease, box-shadow 0.2s ease;box-shadow:0 8px 20px rgba(22,163,74,0.3);text-align:center;">
-        <span style="font-size:36px;margin-bottom:10px;">💬</span>
-        <strong style="font-size:18px;font-weight:800;margin-bottom:4px;">WhatsApp Us</strong>
+    <div class="contact-card-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:12px;margin-bottom:24px;">
+      ${identity.whatsapp_number ? `<a href="https://wa.me/${escapeAttr((identity.whatsapp_number.replace(/\D/g,"").length===10?"91":"") + identity.whatsapp_number.replace(/\D/g,""))}?text=${encodeURIComponent('Hi ' + identity.gym_name + ', I have an enquiry regarding gym membership.')}" target="_blank" style="display:flex;flex-direction:column;align-items:center;padding:16px 10px;background:linear-gradient(135deg, #16a34a 0%, #15803d 100%);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease, box-shadow 0.2s ease;box-shadow:0 8px 20px rgba(22,163,74,0.3);text-align:center;">
+        <span style="font-size:22px;margin-bottom:4px;">💬</span>
+        <strong style="font-size:13px;font-weight:700;margin-bottom:4px;">WhatsApp Us</strong>
         <span style="font-size:13px;opacity:0.9;font-weight:600;">${escapeHtml(identity.whatsapp_number)}</span>
-        <span style="font-size:11px;margin-top:8px;background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:12px;font-weight:700;letter-spacing:0.5px;">⚡ INSTANT CHAT</span>
       </a>` : ""}
 
       ${identity.primary_phone ? `
-      <a href="tel:${escapeAttr(identity.primary_phone)}" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease, border-color 0.2s ease;text-align:center;">
-        <span style="font-size:36px;margin-bottom:10px;">📞</span>
-        <strong style="font-size:18px;font-weight:800;margin-bottom:4px;">Call Desk</strong>
+      <a href="tel:${escapeAttr(identity.primary_phone)}" style="display:flex;flex-direction:column;align-items:center;padding:16px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease, border-color 0.2s ease;text-align:center;">
+        <span style="font-size:22px;margin-bottom:4px;">📞</span>
+        <strong style="font-size:13px;font-weight:700;margin-bottom:4px;">Call Desk</strong>
         <span style="font-size:13px;color:#cbd5e1;font-weight:600;">${escapeHtml(identity.primary_phone)}</span>
-        <span style="font-size:11px;margin-top:8px;background:rgba(255,255,255,0.1);padding:4px 10px;border-radius:12px;color:#94a3b8;font-weight:600;">CALL DIRECTLY</span>
       </a>` : ""}
 
-      <a href="${escapeAttr(instaHref)}" target="_blank" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease;box-shadow:0 8px 20px rgba(253,29,29,0.25);text-align:center;">
-        <span style="font-size:36px;margin-bottom:10px;">📷</span>
-        <strong style="font-size:18px;font-weight:800;margin-bottom:4px;">Instagram</strong>
+      <a href="${escapeAttr(instaHref)}" target="_blank" style="display:flex;flex-direction:column;align-items:center;padding:16px 10px;background:linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease;box-shadow:0 8px 20px rgba(253,29,29,0.25);text-align:center;">
+        <span style="font-size:22px;margin-bottom:4px;">📷</span>
+        <strong style="font-size:13px;font-weight:700;margin-bottom:4px;">Instagram</strong>
         <span style="font-size:13px;opacity:0.9;font-weight:600;">@${escapeHtml(instaHandle)}</span>
-        <span style="font-size:11px;margin-top:8px;background:rgba(255,255,255,0.25);padding:4px 10px;border-radius:12px;font-weight:700;">FOLLOW & DM</span>
       </a>
 
       ${identity.email ? `
-      <a href="mailto:${escapeAttr(identity.email)}" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease;text-align:center;">
-        <span style="font-size:36px;margin-bottom:10px;">✉️</span>
-        <strong style="font-size:18px;font-weight:800;margin-bottom:4px;">Email Us</strong>
+      <a href="mailto:${escapeAttr(identity.email)}" style="display:flex;flex-direction:column;align-items:center;padding:16px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease;text-align:center;">
+        <span style="font-size:22px;margin-bottom:4px;">✉️</span>
+        <strong style="font-size:13px;font-weight:700;margin-bottom:4px;">Email Us</strong>
         <span style="font-size:13px;color:#cbd5e1;font-weight:600;">${escapeHtml(identity.email)}</span>
-        <span style="font-size:11px;margin-top:8px;background:rgba(255,255,255,0.1);padding:4px 10px;border-radius:12px;color:#94a3b8;font-weight:600;">SEND EMAIL</span>
       </a>` : ""}
 
-      <a href="${escapeAttr(mapsHref)}" target="_blank" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease;text-align:center;">
-        <span style="font-size:36px;margin-bottom:10px;">📍</span>
-        <strong style="font-size:18px;font-weight:800;margin-bottom:4px;">Google Maps</strong>
+      <a href="${escapeAttr(mapsHref)}" target="_blank" style="display:flex;flex-direction:column;align-items:center;padding:16px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;color:#ffffff;text-decoration:none;transition:transform 0.2s ease;text-align:center;">
+        <span style="font-size:22px;margin-bottom:4px;">📍</span>
+        <strong style="font-size:13px;font-weight:700;margin-bottom:4px;">Google Maps</strong>
         <span style="font-size:13px;color:#cbd5e1;font-weight:600;">Pappanamcode, Trivandrum</span>
-        <span style="font-size:11px;margin-top:8px;background:rgba(255,255,255,0.1);padding:4px 10px;border-radius:12px;color:#94a3b8;font-weight:600;">GET DIRECTIONS</span>
       </a>
     </div>
 
@@ -3308,6 +3357,9 @@ ${chatWidgetBlock}
   }catch(e){
     setStatus("Website generated.");
   }
+
+  // Restore original in-memory state
+  identity = origIdentity; theme = origTheme; plans = origPlans; offers = origOffers; answers = origAnswers;
 }
 
 

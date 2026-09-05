@@ -912,6 +912,22 @@ def get_favicon():
     raise HTTPException(404, "Logo image not found")
 
 
+@app.get("/qa_schema.js", response_class=FileResponse)
+def get_qa_schema_js():
+    file_path = os.path.join(FRONTEND_DIR, "qa_schema.js")
+    if os.path.exists(file_path):
+        return FileResponse(file_path, media_type="application/javascript")
+    raise HTTPException(404, "qa_schema.js not found")
+
+
+@app.get("/theme-sync.js", response_class=FileResponse)
+def get_theme_sync_js():
+    file_path = os.path.join(FRONTEND_DIR, "theme-sync.js")
+    if os.path.exists(file_path):
+        return FileResponse(file_path, media_type="application/javascript")
+    raise HTTPException(404, "theme-sync.js not found")
+
+
 # Mount static assets directory
 if os.path.exists(FRONTEND_DIR):
     app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")

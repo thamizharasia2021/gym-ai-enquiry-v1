@@ -298,3 +298,17 @@
 {"gym_id": "tarvos-fit", "session_id": "test-session-chat-lead", "ts": 1788518796.7738616, "category": "LEAD_CAPTURED", "lead_capture_prompt": false, "channel": "web"}
 {"gym_id": "tarvos-fit", "session_id": "test-injection", "ts": 1788518797.000859, "category": "FAC", "lead_capture_prompt": false, "channel": "web"}
 {"gym_id": "tarvos-fit", "session_id": "test-category-facilities", "ts": 1788518797.0021532, "category": "MEM", "lead_capture_prompt": true, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "wa-1788519767330-2srsh", "ts": 1788519769.7482114, "category": "MEM", "lead_capture_prompt": true, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "wa-1788519767330-2srsh", "ts": 1788519776.1338153, "category": "MEM", "lead_capture_prompt": true, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "test-session-chat-lead", "ts": 1788522992.0611134, "category": "LEAD_CAPTURED", "lead_capture_prompt": false, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "test-injection", "ts": 1788522992.2433815, "category": "FAC", "lead_capture_prompt": false, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "test-category-facilities", "ts": 1788522992.2446144, "category": "MEM", "lead_capture_prompt": true, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "test-session-chat-lead", "ts": 1788523560.750116, "category": "LEAD_CAPTURED", "lead_capture_prompt": false, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "test-injection", "ts": 1788523560.9264178, "category": "FAC", "lead_capture_prompt": false, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "test-category-facilities", "ts": 1788523560.9276204, "category": "MEM", "lead_capture_prompt": true, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "test-session-chat-lead", "ts": 1788525588.7272027, "category": "LEAD_CAPTURED", "lead_capture_prompt": false, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "test-injection", "ts": 1788525588.928271, "category": "FAC", "lead_capture_prompt": false, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "test-category-facilities", "ts": 1788525588.9295156, "category": "MEM", "lead_capture_prompt": true, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "test-session-chat-lead", "ts": 1788525716.4785805, "category": "LEAD_CAPTURED", "lead_capture_prompt": false, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "test-injection", "ts": 1788525716.7075953, "category": "FAC", "lead_capture_prompt": false, "channel": "web"}
+{"gym_id": "tarvos-fit", "session_id": "test-category-facilities", "ts": 1788525716.7094998, "category": "MEM", "lead_capture_prompt": true, "channel": "web"}
